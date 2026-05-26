@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hamilton Dental — AI Receptionist Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F0F4F8;
+  --surface: #FFFFFF;
+  --surface2: #F7FAFC;
+  --border: #E2E8F0;
+  --text: #1A202C;
+  --muted: #718096;
+  --teal: #0891B2;
+  --teal-light: #E0F7FA;
+  --teal-dim: rgba(8,145,178,0.1);
+  --dark: #0F172A;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); font-family:'DM Sans',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+/* Header */
+header {
+  background: var(--dark);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.clinic-info { display:flex; align-items:center; gap:12px; }
+
+.clinic-avatar {
+  width:40px; height:40px;
+  background: linear-gradient(135deg, #0891B2, #06B6D4);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+}
+
+.clinic-name { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; }
+.clinic-sub { font-size:11px; color:rgba(255,255,255,0.45); margin-top:1px; }
+
+.status-pill {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(8,145,178,0.15);
+  border:1px solid rgba(8,145,178,0.3);
+  border-radius:100px; padding:6px 14px;
+  font-size:12px; color:#22D3EE;
+}
+
+.dot { width:6px; height:6px; background:#22D3EE; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.back-link {
+  color:rgba(255,255,255,0.4); font-size:12px; text-decoration:none;
+  display:flex; align-items:center; gap:6px; transition:color 0.2s;
+}
+.back-link:hover { color:rgba(255,255,255,0.8); }
+
+/* Layout */
+.layout { display:grid; grid-template-columns:260px 1fr; flex:1; overflow:hidden; }
+
+/* Sidebar */
+.sidebar {
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:24px 18px;
+  overflow-y:auto;
+  display:flex; flex-direction:column; gap:24px;
+}
+
+.sidebar-section h3 { font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:12px; }
+
+.quick-btn {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:11px 14px; text-align:left;
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px;
+  cursor:pointer; transition:all 0.2s; margin-bottom:8px;
+  display:flex; align-items:center; gap:10px;
+}
+.quick-btn:hover { background:var(--teal-dim); border-color:rgba(8,145,178,0.3); color:var(--teal); }
+
+.info-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:16px;
+}
+.info-card h4 { font-size:12px; font-weight:600; color:var(--teal); margin-bottom:10px; }
+.info-row { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid var(--border); }
+.info-row:last-child { border:none; }
+.info-row span:last-child { color:var(--text); font-weight:500; }
+.info-row span:first-child { color:var(--muted); }
+
+/* Chat */
+.chat-area { display:flex; flex-direction:column; overflow:hidden; }
+
+.messages {
+  flex:1; overflow-y:auto; padding:28px 32px;
+  display:flex; flex-direction:column; gap:20px;
+}
+.messages::-webkit-scrollbar { width:4px; }
+.messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+/* Welcome */
+.welcome { text-align:center; padding:32px 20px; }
+.welcome-avatar {
+  width:60px; height:60px; background:linear-gradient(135deg, #0891B2, #06B6D4);
+  border-radius:18px; display:flex; align-items:center; justify-content:center;
+  font-size:26px; margin:0 auto 16px;
+}
+.welcome h2 { font-family:'Syne',sans-serif; font-size:22px; color:var(--text); margin-bottom:8px; }
+.welcome p { font-size:14px; color:var(--muted); line-height:1.6; max-width:360px; margin:0 auto 24px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.chip {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:100px; padding:8px 16px; font-size:13px; color:var(--text);
+  cursor:pointer; transition:all 0.2s;
+}
+.chip:hover { background:var(--teal-dim); border-color:rgba(8,145,178,0.3); color:var(--teal); }
+
+/* Messages */
+.msg { display:flex; gap:12px; animation:fadeUp 0.3s ease; }
+.msg.user { flex-direction:row-reverse; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.msg-avatar {
+  width:34px; height:34px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+}
+.msg.ai .msg-avatar { background:linear-gradient(135deg,#0891B2,#06B6D4); }
+.msg.user .msg-avatar { background:var(--surface2); border:1px solid var(--border); }
+
+.msg-bubble {
+  max-width:75%; padding:13px 17px; border-radius:16px; font-size:14px; line-height:1.65;
+}
+.msg.ai .msg-bubble { background:var(--surface); border:1px solid var(--border); border-top-left-radius:4px; color:var(--text); }
+.msg.user .msg-bubble { background:linear-gradient(135deg,#0891B2,#06B6D4); border-top-right-radius:4px; color:#fff; }
+
+/* Typing */
+.typing { display:flex; gap:12px; animation:fadeUp 0.3s ease; }
+.typing-dots { display:flex; gap:5px; align-items:center; padding:14px 18px; background:var(--surface); border:1px solid var(--border); border-radius:16px; border-top-left-radius:4px; }
+.typing-dot { width:7px; height:7px; background:var(--teal); border-radius:50%; animation:bounce 1.2s infinite; }
+.typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
+
+/* Input */
+.input-area { border-top:1px solid var(--border); padding:16px 32px 20px; background:var(--surface); }
+.input-row {
+  display:flex; gap:10px; align-items:flex-end;
+  background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:10px 14px;
+  transition:border-color 0.2s;
+}
+.input-row:focus-within { border-color:rgba(8,145,178,0.4); }
+textarea { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; resize:none; min-height:22px; max-height:100px; line-height:1.5; }
+textarea::placeholder { color:var(--muted); }
+
+.send-btn {
+  width:36px; height:36px; background:linear-gradient(135deg,#0891B2,#06B6D4);
+  border:none; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; flex-shrink:0;
+}
+.send-btn:hover { transform:scale(1.05); }
+.send-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.send-btn svg { width:15px; height:15px; fill:#fff; }
+
+.input-hint { font-size:11px; color:var(--muted); text-align:center; margin-top:8px; }
+
+/* Powered bar */
+.powered { text-align:center; padding:8px; font-size:11px; color:rgba(113,128,150,0.6); border-top:1px solid var(--border); background:var(--surface); }
+.powered span { color:var(--teal); }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="index.html" class="back-link">← Back to Kronos AI</a>
+  </div>
+  <div class="clinic-info">
+    <div class="clinic-avatar">🦷</div>
+    <div>
+      <div class="clinic-name">Hamilton Dental Centre</div>
+      <div class="clinic-sub">AI Receptionist — Powered by Kronos AI</div>
+    </div>
+  </div>
+  <div class="status-pill"><div class="dot"></div>Online 24/7</div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h3>Quick Questions</h3>
+      <button class="quick-btn" onclick="q('I need to book an appointment')">📅 Book Appointment</button>
+      <button class="quick-btn" onclick="q('What are your opening hours?')">🕐 Opening Hours</button>
+      <button class="quick-btn" onclick="q('How much does a checkup cost?')">💰 Pricing</button>
+      <button class="quick-btn" onclick="q('Do you accept ACC?')">🏥 Insurance & ACC</button>
+      <button class="quick-btn" onclick="q('I have a toothache, is it urgent?')">🚨 Urgent / Emergency</button>
+      <button class="quick-btn" onclick="q('Where are you located?')">📍 Location</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="info-card">
+        <h4>📋 Clinic Info</h4>
+        <div class="info-row"><span>Phone</span><span>(07) 555 0123</span></div>
+        <div class="info-row"><span>Mon–Fri</span><span>8am – 5:30pm</span></div>
+        <div class="info-row"><span>Saturday</span><span>9am – 1pm</span></div>
+        <div class="info-row"><span>Emergency</span><span>Available</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="info-card">
+        <h4>👨‍⚕️ Our Team</h4>
+        <div class="info-row"><span>Dr. Patel</span><span>General</span></div>
+        <div class="info-row"><span>Dr. Chen</span><span>Cosmetic</span></div>
+        <div class="info-row"><span>Dr. Williams</span><span>Ortho</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-avatar">🦷</div>
+        <h2>Kia ora! I'm your AI Receptionist</h2>
+        <p>I can book appointments, answer questions about our services, pricing, and help with anything you need. How can I help you today?</p>
+        <div class="chips">
+          <div class="chip" onclick="q('Book me in for a checkup this week')">Book a checkup</div>
+          <div class="chip" onclick="q('What teeth whitening options do you offer?')">Teeth whitening</div>
+          <div class="chip" onclick="q('My child needs braces, what do you recommend?')">Kids & braces</div>
+          <div class="chip" onclick="q('I broke a tooth, what should I do?')">Broken tooth</div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Ask anything about our dental services..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="send()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Demo powered by <span style="color:var(--teal)">Kronos AI</span> · This is a live AI demo</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM = `You are a friendly, professional AI receptionist for Hamilton Dental Centre, a dental clinic in Hamilton, New Zealand.
+
+You help patients with:
+- Booking appointments (ask for preferred day/time, type of appointment, and patient name)
+- Answering questions about services: general dentistry, checkups, teeth whitening, fillings, crowns, braces/orthodontics, emergency dental, children's dentistry
+- Pricing: Checkup + clean $95, Whitening from $350, Fillings from $150, Emergency consult $85
+- Hours: Mon-Fri 8am-5:30pm, Saturday 9am-1pm
+- Location: 142 Victoria Street, Hamilton Central
+- ACC registered, most health insurance accepted
+- Dentists: Dr. Patel (general), Dr. Chen (cosmetic), Dr. Williams (orthodontics)
+
+Be warm, reassuring, and helpful. Use casual NZ-friendly language. Keep responses concise (under 120 words). For bookings, confirm day, time, dentist, and type of appointment. Always end with an offer to help further.`;
+
+let msgs = [], loading = false;
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+function q(text) { document.getElementById('userInput').value=text; send(); }
+
+function removeWelcome() { const w=document.getElementById('welcome'); if(w)w.remove(); }
+
+function addMsg(role, content) {
+  removeWelcome();
+  const c=document.getElementById('messages');
+  const d=document.createElement('div');
+  d.className=`msg ${role==='user'?'user':'ai'}`;
+  const av=document.createElement('div'); av.className='msg-avatar';
+  av.textContent=role==='user'?'👤':'🦷';
+  const b=document.createElement('div'); b.className='msg-bubble';
+  b.innerHTML=role==='assistant'
+    ? content.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')
+    : content;
+  d.appendChild(av); d.appendChild(b); c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+}
+
+function showTyping() {
+  removeWelcome();
+  const c=document.getElementById('messages');
+  const d=document.createElement('div'); d.className='typing'; d.id='typing';
+  d.innerHTML=`<div class="msg-avatar" style="background:linear-gradient(135deg,#0891B2,#06B6D4);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:15px;">🦷</div><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+
+function removeTyping() { const t=document.getElementById('typing'); if(t)t.remove(); }
+
+async function send() {
+  const input=document.getElementById('userInput');
+  const text=input.value.trim();
+  if(!text||loading) return;
+  loading=true;
+  document.getElementById('sendBtn').disabled=true;
+  input.value=''; input.style.height='auto';
+  addMsg('user',text);
+  msgs.push({role:'user',content:text});
+  showTyping();
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:msgs})
+    });
+    const data=await res.json();
+    removeTyping();
+    const reply=data.content?.[0]?.text||"Sorry, I couldn't connect right now. Please call us on (07) 555 0123.";
+    msgs.push({role:'assistant',content:reply});
+    addMsg('assistant',reply);
+  } catch(e) {
+    removeTyping();
+    addMsg('assistant',"Sorry, I'm having a moment! Please call us directly on (07) 555 0123 or try again shortly.");
+  }
+  loading=false;
+  document.getElementById('sendBtn').disabled=false;
+  input.focus();
+}
+</script>
+</body>
+</html>
