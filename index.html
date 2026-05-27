@@ -1085,6 +1085,18 @@ footer {
         <span class="price-monthly">retainer on request</span>
       </div>
     </div>
+    <div class="service-card reveal" style="border-color:rgba(0,229,255,0.2);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00E5FF,#7C3AED);"></div>
+      <div style="position:absolute;top:12px;right:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);border-radius:100px;padding:3px 10px;font-size:10px;color:#00E5FF;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">New</div>
+      <div class="service-icon">🌐</div>
+      <h3>AI Smart Website</h3>
+      <p>We build your business a professional website with AI already built in — chatbot, lead capture, and automated follow-up. Not just a website. A 24/7 sales machine.</p>
+      <div class="service-price">
+        <span class="price-setup">From $1,500</span>
+        <span class="price-divider">|</span>
+        <span class="price-monthly">from $200/mo retainer</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1287,24 +1299,24 @@ footer {
       <h2 class="section-title">Ready to Automate?</h2>
       <p class="section-sub" style="margin:0 auto;">Book a free 30-minute strategy call. We'll identify exactly where AI can save your business time and money — no obligation.</p>
     </div>
-    <div class="contact-form reveal">
+    <form class="contact-form reveal" action="https://formspree.io/f/mykvbvqn" method="POST" onsubmit="handleSubmit(event)">
       <div class="form-row">
         <div class="form-field">
           <label>First Name</label>
-          <input type="text" placeholder="Your name" />
+          <input type="text" name="name" placeholder="Your name" required />
         </div>
         <div class="form-field">
           <label>Business Name</label>
-          <input type="text" placeholder="Your business" />
+          <input type="text" name="business" placeholder="Your business" required />
         </div>
       </div>
       <div class="form-field">
         <label>Email Address</label>
-        <input type="email" placeholder="you@yourbusiness.com" />
+        <input type="email" name="email" placeholder="you@yourbusiness.com" required />
       </div>
       <div class="form-field">
         <label>Industry</label>
-        <select>
+        <select name="industry">
           <option value="">Select your industry...</option>
           <option>Education</option>
           <option>Real Estate</option>
@@ -1319,11 +1331,11 @@ footer {
       </div>
       <div class="form-field">
         <label>What's Your Biggest Time Waster Right Now?</label>
-        <textarea placeholder="e.g. Answering the same customer questions over and over, manually entering data, chasing leads..."></textarea>
+        <textarea name="message" placeholder="e.g. Answering the same customer questions over and over, manually entering data, chasing leads..."></textarea>
       </div>
-      <button class="form-submit" onclick="handleSubmit(this)">Book My Free Strategy Call →</button>
+      <button type="submit" class="form-submit" id="submitBtn">Book My Free Strategy Call →</button>
       <p class="form-note">🔒 No spam. No sales pressure. Just an honest conversation about what AI can do for your business.</p>
-    </div>
+    </form>
   </div>
 </section>
 
@@ -1352,10 +1364,14 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // Form submit
-function handleSubmit(btn) {
-  btn.textContent = '✓ Request Sent! We\'ll be in touch within 24 hours.';
-  btn.style.background = '#2D6A4F';
+function handleSubmit(e) {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Sending...';
   btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✓ Sent! We\'ll be in touch within 24 hours.';
+    btn.style.background = '#00E096';
+  }, 1500);
 }
 
 // Smooth nav
