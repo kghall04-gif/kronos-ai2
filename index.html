@@ -260,6 +260,7 @@ nav {
 
 /* SERVICES */
 .services { padding:100px 6%; }
+.services-inner { max-width:1100px; margin:0 auto; }
 .services-header { text-align:center; margin-bottom:56px; }
 .services-header .section-sub { margin:0 auto; }
 .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--cyan); font-weight:600; margin-bottom:12px; }
@@ -286,7 +287,7 @@ nav {
 
 /* DEMOS */
 .demos { padding:100px 6%; background:var(--surface); }
-.demos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:900px; margin-top:52px; }
+.demos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:900px; margin:52px auto 0; }
 .demo-card {
   background:var(--bg); border:1px solid var(--border); border-radius:16px;
   padding:28px 22px; transition:all .25s; text-decoration:none; display:block;
@@ -444,6 +445,7 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
 
 <!-- SERVICES -->
 <section class="services" id="services">
+<div class="services-inner">
   <div class="services-header reveal">
     <div class="section-label">What We Build</div>
     <h2 class="section-title">AI That Works For You</h2>
@@ -457,10 +459,12 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
     <div class="svc-card reveal"><span class="svc-emoji">🎯</span><h3>Lead Generation</h3><p>AI finds and contacts new customers for you. Wake up to a full inbox of warm leads.</p><div class="svc-price">From $2,500 + $500/mo</div></div>
     <div class="svc-card reveal"><span class="svc-emoji">🛠️</span><h3>Custom AI Solutions</h3><p>Got a specific problem? We build bespoke AI systems tailored to your exact needs.</p><div class="svc-price">From $3,000 + retainer</div></div>
   </div>
+</div>
 </section>
 
 <!-- DEMOS -->
 <section class="demos" id="demos">
+<div class="services-inner">
   <div class="services-header reveal">
     <div class="section-label">Live Demos</div>
     <h2 class="section-title">Try It Yourself</h2>
@@ -471,6 +475,7 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
     <a href="demo-dental.html" class="demo-card reveal"><span class="demo-em">🦷</span><h3>Dental Receptionist</h3><p>Books appointments and answers FAQs</p><span class="demo-try">Try live →</span></a>
     <a href="demo-realestate.html" class="demo-card reveal"><span class="demo-em">🏠</span><h3>Real Estate Agent</h3><p>Qualifies leads and books viewings</p><span class="demo-try">Try live →</span></a>
   </div>
+</div>
 </section>
 
 <!-- PRICING -->
