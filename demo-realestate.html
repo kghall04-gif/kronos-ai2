@@ -125,6 +125,23 @@ textarea::placeholder { color:var(--muted); }
 .send-btn svg { width:15px; height:15px; fill:#111; }
 
 .input-hint { font-size:11px; color:var(--muted); text-align:center; margin-top:8px; }
+
+@media(max-width:768px) {
+  body { height:100dvh; overflow:hidden; }
+  header { padding:0 16px; height:56px; }
+  .agency-info .agency-name { font-size:13px; }
+  .agency-info .agency-sub { display:none; }
+  .layout { grid-template-columns:1fr; height:calc(100dvh - 56px - 32px); }
+  .sidebar { display:none; }
+  .chat-area { display:flex; flex-direction:column; height:100%; }
+  .messages { padding:16px; gap:14px; }
+  .msg-bubble { max-width:88%; font-size:13px; padding:11px 14px; }
+  .input-area { padding:12px 16px 16px; }
+  .chips { gap:6px; }
+  .chip { font-size:12px; padding:7px 12px; }
+  .welcome h2 { font-size:18px; }
+  .welcome p { font-size:13px; }
+}
 </style>
 </head>
 <body>
