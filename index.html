@@ -4,973 +4,405 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kronos AI — Intelligent Automation for Modern Business</title>
-<meta name="description" content="Kronos AI builds custom AI chatbots, virtual assistants, and automated workflows that save your business time and money. Based in New Zealand.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080810;
-  --surface: #0E0E1A;
-  --surface2: #13131F;
+  --bg: #020408;
+  --surface: #080D14;
   --border: rgba(255,255,255,0.06);
-  --border-bright: rgba(255,255,255,0.12);
-  --text: #F0EFF8;
-  --muted: #6B6B80;
-  --cyan: #00E5FF;
-  --cyan-dim: rgba(0,229,255,0.12);
-  --cyan-glow: rgba(0,229,255,0.25);
-  --purple: #7C3AED;
-  --purple-dim: rgba(124,58,237,0.15);
-  --white: #FFFFFF;
+  --text: #E8EDF8;
+  --muted: #5A6480;
+  --cyan: #00D4FF;
+  --cyan-dim: rgba(0,212,255,0.08);
+  --purple: #7B2FFF;
+  --gold: #FFB800;
 }
 
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
 
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  overflow-x: hidden;
-  line-height: 1.6;
+/* ══════════════════════════════
+   LOADING SCREEN
+══════════════════════════════ */
+#loader {
+  position:fixed; inset:0; z-index:9999;
+  background:#000;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column;
+  transition:opacity 1.2s ease, transform 1.2s ease;
 }
 
-/* ─── NOISE TEXTURE ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.4;
+#loader.exit {
+  opacity:0;
+  transform:scale(1.1);
+  pointer-events:none;
 }
 
-/* ─── NAV ─── */
+#loaderCanvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+}
+
+.loader-content {
+  position:relative; z-index:2;
+  text-align:center;
+  animation:loaderPulse 2s ease infinite;
+}
+
+@keyframes loaderPulse {
+  0%,100% { opacity:0.7; transform:scale(1); }
+  50% { opacity:1; transform:scale(1.02); }
+}
+
+.loader-logo {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(48px,8vw,96px);
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:#fff;
+  text-shadow:
+    0 0 40px rgba(0,212,255,0.8),
+    0 0 80px rgba(0,212,255,0.4),
+    0 0 120px rgba(123,47,255,0.3);
+  animation:glitchText 4s infinite;
+}
+
+.loader-logo span { color:var(--cyan); }
+
+@keyframes glitchText {
+  0%,90%,100% { text-shadow: 0 0 40px rgba(0,212,255,0.8), 0 0 80px rgba(0,212,255,0.4); transform:none; }
+  92% { text-shadow: -3px 0 #ff0080, 3px 0 #00d4ff; transform:translateX(-2px); }
+  94% { text-shadow: 3px 0 #ff0080, -3px 0 #00d4ff; transform:translateX(2px); }
+  96% { text-shadow: 0 0 40px rgba(0,212,255,0.8); transform:none; }
+}
+
+.loader-sub {
+  font-size:14px; color:rgba(255,255,255,0.4);
+  letter-spacing:.3em; text-transform:uppercase;
+  margin-top:12px;
+  animation:fadeInUp 1s ease .5s both;
+}
+
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.loader-progress {
+  width:200px; height:2px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px; margin-top:32px;
+  overflow:hidden;
+  animation:fadeInUp 1s ease .8s both;
+}
+
+.loader-progress-fill {
+  height:100%;
+  background:linear-gradient(90deg, var(--purple), var(--cyan));
+  border-radius:2px;
+  width:0%;
+  transition:width .1s linear;
+  box-shadow:0 0 10px var(--cyan);
+}
+
+/* ══════════════════════════════
+   MAIN SITE
+══════════════════════════════ */
+#mainSite {
+  opacity:0;
+  transition:opacity 1s ease;
+}
+#mainSite.visible { opacity:1; }
+
+/* NAV */
 nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 0 6%;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  background: rgba(8,8,16,0.85);
-  backdrop-filter: blur(20px);
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:0 6%; height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(2,4,8,0.7); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
 }
 
 .nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+  color:#fff; letter-spacing:-.02em; text-decoration:none;
 }
+.nav-logo span { color:var(--cyan); }
 
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  position: relative;
-}
-
-.logo-mark svg { width: 36px; height: 36px; }
-
-.logo-text {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.02em;
-}
-
-.logo-text span { color: var(--cyan); }
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 36px;
-  list-style: none;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.2s;
-  letter-spacing: 0.02em;
-}
-
-.nav-links a:hover { color: var(--text); }
-
+.nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+.nav-links a { font-size:14px; color:var(--muted); text-decoration:none; transition:color .2s; }
+.nav-links a:hover { color:var(--text); }
 .nav-cta {
-  background: var(--cyan);
-  color: var(--bg) !important;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 600 !important;
-  font-size: 13px !important;
-  transition: all 0.2s !important;
+  background:var(--cyan); color:#020408 !important;
+  padding:10px 22px; border-radius:8px; font-weight:600 !important;
+  font-size:13px !important; transition:all .2s !important;
 }
+.nav-cta:hover { box-shadow:0 0 30px rgba(0,212,255,0.4); }
 
-.nav-cta:hover {
-  background: #33EAFF !important;
-  color: var(--bg) !important;
-  box-shadow: 0 0 24px var(--cyan-glow);
-}
-
-/* ─── HERO ─── */
+/* HERO */
 .hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 120px 6% 80px;
-  position: relative;
-  overflow: hidden;
+  min-height:100vh; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; text-align:center;
+  padding:100px 6% 60px;
 }
 
-/* Gradient orbs */
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(ellipse, rgba(0,229,255,0.07) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: 10%;
-  left: 30%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%);
-  pointer-events: none;
+#heroCanvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  pointer-events:none;
 }
 
 .hero-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 860px;
+  position:relative; z-index:2;
+  max-width:900px;
 }
 
 .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--cyan-dim);
-  border: 1px solid rgba(0,229,255,0.25);
-  border-radius: 100px;
-  padding: 7px 16px;
-  font-size: 12px;
-  color: var(--cyan);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 500;
-  margin-bottom: 32px;
-  animation: fadeUp 0.6s ease both;
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
+  border-radius:100px; padding:8px 18px;
+  font-size:12px; color:var(--cyan); font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:28px;
+  animation:fadeInUp 1s ease .3s both;
 }
 
 .badge-dot {
-  width: 6px; height: 6px;
-  background: var(--cyan);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
+  width:7px; height:7px; background:var(--cyan); border-radius:50%;
+  animation:pulse 2s infinite;
+  box-shadow:0 0 8px var(--cyan);
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+.hero h1 {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(42px,6vw,88px);
+  font-weight:800; line-height:1.04;
+  letter-spacing:-.03em; color:#fff;
+  margin-bottom:22px;
+  animation:fadeInUp 1s ease .5s both;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
+.hero h1 .line1 { display:block; }
+.hero h1 .line2 {
+  display:block; color:transparent;
+  background:linear-gradient(135deg, var(--cyan), var(--purple), var(--gold));
+  -webkit-background-clip:text; background-clip:text;
+  animation:gradientShift 4s ease infinite;
 }
 
-h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(44px, 7vw, 82px);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  color: var(--white);
-  margin-bottom: 24px;
-  animation: fadeUp 0.6s 0.1s ease both;
+@keyframes gradientShift {
+  0%,100% { filter:hue-rotate(0deg); }
+  50% { filter:hue-rotate(30deg); }
 }
 
-h1 .accent { color: var(--cyan); }
-h1 .dim { color: rgba(255,255,255,0.35); }
-
-.hero-sub {
-  font-size: clamp(16px, 2vw, 19px);
-  color: var(--muted);
-  max-width: 560px;
-  margin: 0 auto 48px;
-  line-height: 1.7;
-  font-weight: 300;
-  animation: fadeUp 0.6s 0.2s ease both;
+.hero p {
+  font-size:clamp(16px,2vw,20px); color:var(--muted);
+  max-width:600px; margin:0 auto 40px;
+  line-height:1.7; font-weight:300;
+  animation:fadeInUp 1s ease .7s both;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-  animation: fadeUp 0.6s 0.3s ease both;
+.hero-btns {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  animation:fadeInUp 1s ease .9s both;
 }
 
 .btn-primary {
-  background: var(--cyan);
-  color: var(--bg);
-  padding: 16px 32px;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.25s;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.01em;
+  background:linear-gradient(135deg,var(--cyan),#0099CC);
+  color:#020408; padding:16px 32px; border-radius:10px;
+  font-size:15px; font-weight:700; text-decoration:none;
+  transition:all .25s; border:none; cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 0 30px rgba(0,212,255,0.3);
 }
-
-.btn-primary:hover {
-  background: #33EAFF;
-  box-shadow: 0 0 40px var(--cyan-glow);
-  transform: translateY(-1px);
-}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 50px rgba(0,212,255,0.5); }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--text);
-  padding: 16px 32px;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  text-decoration: none;
-  border: 1px solid var(--border-bright);
-  transition: all 0.25s;
-  cursor: pointer;
+  background:transparent; color:var(--text);
+  padding:16px 32px; border-radius:10px;
+  font-size:15px; font-weight:500; text-decoration:none;
+  border:1px solid rgba(255,255,255,0.12); transition:all .25s;
+}
+.btn-secondary:hover { border-color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.04); }
+
+/* Floating orbs in hero */
+.orb {
+  position:absolute; border-radius:50%; pointer-events:none;
+  filter:blur(60px); animation:orbFloat 8s ease infinite;
+}
+.orb1 { width:400px; height:400px; background:rgba(123,47,255,0.12); top:-10%; left:-5%; animation-delay:0s; }
+.orb2 { width:300px; height:300px; background:rgba(0,212,255,0.1); bottom:10%; right:-5%; animation-delay:-3s; }
+.orb3 { width:200px; height:200px; background:rgba(255,184,0,0.06); top:40%; left:20%; animation-delay:-5s; }
+
+@keyframes orbFloat {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33% { transform:translate(30px,-20px) scale(1.05); }
+  66% { transform:translate(-20px,30px) scale(.95); }
 }
 
-.btn-secondary:hover {
-  border-color: rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.04);
-}
-
-/* Stats bar */
-.hero-stats {
-  display: flex;
-  gap: 48px;
-  justify-content: center;
-  margin-top: 72px;
-  padding-top: 48px;
-  border-top: 1px solid var(--border);
-  animation: fadeUp 0.6s 0.4s ease both;
-  flex-wrap: wrap;
-}
-
-.stat {
-  text-align: center;
-}
-
+/* STATS */
+.stats { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.stats-inner { display:flex; max-width:1100px; margin:0 auto; }
+.stat { flex:1; padding:32px 24px; text-align:center; border-right:1px solid var(--border); }
+.stat:last-child { border-right:none; }
 .stat-num {
-  font-family: 'Syne', sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.02em;
+  font-family:'Syne',sans-serif; font-size:32px; font-weight:800;
+  color:var(--cyan); letter-spacing:-.02em;
+  text-shadow:0 0 20px rgba(0,212,255,0.4);
 }
+.stat-lbl { font-size:12px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.06em; }
 
-.stat-num span { color: var(--cyan); }
+/* SERVICES */
+.services { padding:100px 6%; }
+.section-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--cyan); font-weight:600; margin-bottom:12px; }
+.section-title { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; color:#fff; letter-spacing:-.02em; margin-bottom:14px; line-height:1.1; }
+.section-sub { font-size:16px; color:var(--muted); max-width:500px; line-height:1.7; margin-bottom:56px; font-weight:300; }
 
-.stat-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
+.svc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:1100px; }
+.svc-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:32px 28px; transition:all .3s;
+  position:relative; overflow:hidden;
 }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.svc-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity:0; transition:opacity .3s;
 }
+.svc-card:hover { border-color:rgba(0,212,255,0.15); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,.4), 0 0 40px rgba(0,212,255,0.05); }
+.svc-card:hover::before { opacity:1; }
+.svc-emoji { font-size:28px; margin-bottom:18px; display:block; }
+.svc-card h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; margin-bottom:10px; }
+.svc-card p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:20px; font-weight:300; }
+.svc-price { font-size:13px; color:var(--cyan); font-weight:600; border-top:1px solid var(--border); padding-top:16px; }
 
-/* ─── SECTION BASE ─── */
-section {
-  padding: 100px 6%;
-  position: relative;
-}
-
-.section-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--cyan);
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(32px, 4vw, 48px);
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin-bottom: 16px;
-}
-
-.section-sub {
-  font-size: 16px;
-  color: var(--muted);
-  max-width: 520px;
-  line-height: 1.7;
-}
-
-/* ─── SERVICES ─── */
-.services { background: var(--surface); }
-
-.services-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.services-header .section-sub { margin: 0 auto; }
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.service-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px 32px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.service-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--purple));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.service-card:hover {
-  border-color: rgba(0,229,255,0.2);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-
-.service-card:hover::before { opacity: 1; }
-
-.service-icon {
-  width: 52px;
-  height: 52px;
-  background: var(--cyan-dim);
-  border: 1px solid rgba(0,229,255,0.2);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  margin-bottom: 24px;
-}
-
-.service-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 12px;
-  letter-spacing: -0.01em;
-}
-
-.service-card p {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 24px;
-}
-
-.service-price {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-
-.price-setup {
-  font-family: 'Syne', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--white);
-}
-
-.price-monthly {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.price-divider {
-  font-size: 13px;
-  color: var(--border-bright);
-  margin: 0 4px;
-}
-
-/* ─── HOW IT WORKS ─── */
-.how {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.how-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: center;
-  margin-top: 64px;
-}
-
-.how-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.how-step {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-}
-
-.step-num {
-  width: 40px;
-  height: 40px;
-  background: var(--cyan-dim);
-  border: 1px solid rgba(0,229,255,0.25);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--cyan);
-  flex-shrink: 0;
-}
-
-.step-content h4 {
-  font-family: 'Syne', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 6px;
-}
-
-.step-content p {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.how-visual {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px;
-  position: relative;
-  overflow: hidden;
-}
-
-.how-visual::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(ellipse, rgba(0,229,255,0.06) 0%, transparent 70%);
-}
-
-.visual-chat {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.chat-bubble {
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.5;
-  max-width: 85%;
-}
-
-.chat-bubble.bot {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 12px 12px 12px 4px;
-}
-
-.chat-bubble.user {
-  background: var(--cyan-dim);
-  border: 1px solid rgba(0,229,255,0.2);
-  color: var(--cyan);
-  align-self: flex-end;
-  border-radius: 12px 12px 4px 12px;
-}
-
-.chat-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-/* ─── DEMOS ─── */
-.demos { background: var(--surface); }
-
-.demos-header {
-  text-align: center;
-  margin-bottom: 56px;
-}
-
-.demos-header .section-sub { margin: 0 auto; }
-
-.demos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
+/* DEMOS */
+.demos { padding:100px 6%; background:var(--surface); }
+.demos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:900px; margin-top:52px; }
 .demo-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
+  background:var(--bg); border:1px solid var(--border); border-radius:16px;
+  padding:28px 22px; transition:all .25s; text-decoration:none; display:block;
+  position:relative; overflow:hidden;
 }
-
-.demo-card:hover {
-  border-color: rgba(0,229,255,0.25);
-  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-  transform: translateY(-3px);
+.demo-card::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(0,212,255,0.06), transparent 60%);
+  opacity:0; transition:opacity .3s;
 }
+.demo-card:hover { border-color:rgba(0,212,255,0.25); transform:translateY(-3px); box-shadow:0 8px 40px rgba(0,0,0,.4); }
+.demo-card:hover::after { opacity:1; }
+.demo-em { font-size:32px; margin-bottom:14px; display:block; position:relative; z-index:1; }
+.demo-card h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; position:relative; z-index:1; }
+.demo-card p { font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:14px; font-weight:300; position:relative; z-index:1; }
+.demo-try { font-size:12px; color:var(--cyan); font-weight:600; position:relative; z-index:1; }
 
-.demo-emoji {
-  font-size: 36px;
-  margin-bottom: 16px;
-  display: block;
+/* PRICING */
+.pricing { padding:100px 6%; }
+.pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:900px; margin-top:52px; }
+.price-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px; padding:36px 28px; position:relative;
 }
-
-.demo-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 8px;
+.price-card.featured {
+  border-color:rgba(0,212,255,0.3);
+  box-shadow:0 0 60px rgba(0,212,255,0.08);
 }
-
-.demo-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.demo-tag {
-  display: inline-block;
-  background: var(--cyan-dim);
-  border: 1px solid rgba(0,229,255,0.2);
-  color: var(--cyan);
-  font-size: 11px;
-  padding: 5px 12px;
-  border-radius: 100px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-/* ─── PRICING ─── */
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  max-width: 1000px;
-  margin: 64px auto 0;
-}
-
-.pricing-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 40px 32px;
-  position: relative;
-  transition: all 0.3s;
-}
-
-.pricing-card.featured {
-  background: var(--surface2);
-  border-color: rgba(0,229,255,0.3);
-  box-shadow: 0 0 60px rgba(0,229,255,0.06);
-}
-
 .featured-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--cyan);
-  color: var(--bg);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 16px;
-  border-radius: 100px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
+  position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--purple),var(--cyan));
+  color:#fff; font-size:11px; font-weight:700; padding:4px 16px;
+  border-radius:100px; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;
 }
+.price-card h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; margin-bottom:6px; }
+.price-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+.price-amount { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; color:#fff; letter-spacing:-.02em; margin-bottom:4px; }
+.price-amount span { font-size:16px; font-weight:400; color:var(--muted); }
+.price-mo { font-size:13px; color:var(--muted); margin-bottom:24px; }
+.price-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
+.price-features li { font-size:14px; color:var(--text); display:flex; align-items:center; gap:10px; }
+.price-features li::before { content:'✓'; color:var(--cyan); font-weight:700; }
+.price-btn { width:100%; padding:14px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; border:none; font-family:'DM Sans',sans-serif; }
+.price-btn.solid { background:linear-gradient(135deg,var(--cyan),#0099CC); color:#020408; }
+.price-btn.solid:hover { box-shadow:0 0 30px rgba(0,212,255,0.3); }
+.price-btn.ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
+.price-btn.ghost:hover { border-color:rgba(255,255,255,0.25); }
 
-.pricing-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 8px;
+/* ABOUT */
+.about { padding:100px 6%; background:var(--surface); }
+.about-inner { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; max-width:1100px; margin:0 auto; }
+.about p { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:16px; font-weight:300; }
+.about p strong { color:var(--text); }
+.highlight-list { display:flex; flex-direction:column; gap:12px; }
+.hl { display:flex; align-items:center; gap:14px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; transition:all .2s; }
+.hl:hover { border-color:rgba(0,212,255,0.15); }
+.hl-icon { font-size:20px; }
+.hl-text { font-size:14px; color:var(--text); font-weight:500; }
+.hl-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* CONTACT */
+.contact { padding:100px 6%; }
+.contact-inner { max-width:580px; margin:0 auto; text-align:center; }
+.contact-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:40px; margin-top:40px; text-align:left; }
+.form-field { display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
+.form-field label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+.form-field input, .form-field textarea, .form-field select {
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:14px; outline:none; transition:border-color .2s;
 }
+.form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color:rgba(0,212,255,0.35); }
+.form-field input::placeholder, .form-field textarea::placeholder { color:var(--muted); }
+.form-field select option { background:#080D14; }
+.form-field textarea { resize:vertical; min-height:90px; line-height:1.5; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.submit-btn { width:100%; padding:15px; background:linear-gradient(135deg,var(--cyan),#0099CC); color:#020408; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:6px; }
+.submit-btn:hover { box-shadow:0 0 40px rgba(0,212,255,0.3); transform:translateY(-1px); }
 
-.pricing-card .price {
-  font-family: 'Syne', sans-serif;
-  font-size: 42px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.03em;
-  margin: 20px 0 4px;
-}
+/* FOOTER */
+footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.footer-logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff; }
+.footer-logo span { color:var(--cyan); }
+.footer-copy { font-size:13px; color:var(--muted); }
+.footer-links { display:flex; gap:20px; }
+.footer-links a { font-size:13px; color:var(--muted); text-decoration:none; transition:color .2s; }
+.footer-links a:hover { color:var(--text); }
 
-.pricing-card .price span {
-  font-size: 18px;
-  font-weight: 400;
-  color: var(--muted);
-}
+/* Scroll reveal */
+.reveal { opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
 
-.pricing-card .price-note {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 28px;
-}
-
-.pricing-features {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.pricing-features li {
-  font-size: 14px;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pricing-features li::before {
-  content: '✓';
-  color: var(--cyan);
-  font-weight: 700;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.pricing-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s;
-  text-align: center;
-  border: none;
-  letter-spacing: 0.02em;
-}
-
-.pricing-btn.outline {
-  background: transparent;
-  border: 1px solid var(--border-bright);
-  color: var(--text);
-}
-
-.pricing-btn.outline:hover {
-  border-color: rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.04);
-}
-
-.pricing-btn.solid {
-  background: var(--cyan);
-  color: var(--bg);
-}
-
-.pricing-btn.solid:hover {
-  background: #33EAFF;
-  box-shadow: 0 0 30px var(--cyan-glow);
-}
-
-/* ─── ABOUT ─── */
-.about {
-  background: var(--surface);
-}
-
-.about-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: center;
-}
-
-.about-text p {
-  font-size: 15px;
-  color: var(--muted);
-  line-height: 1.8;
-  margin-bottom: 20px;
-}
-
-.about-text p strong { color: var(--text); }
-
-.about-highlights {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.highlight {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-
-.highlight-icon {
-  font-size: 22px;
-  width: 44px;
-  text-align: center;
-}
-
-.highlight-text {
-  font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.highlight-sub {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-/* ─── CONTACT ─── */
-.contact {
-  max-width: 640px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.contact-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 48px 40px;
-  margin-top: 48px;
-  text-align: left;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.form-field label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.form-field input,
-.form-field textarea,
-.form-field select {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 13px 16px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-field input::placeholder,
-.form-field textarea::placeholder { color: var(--muted); }
-
-.form-field input:focus,
-.form-field textarea:focus,
-.form-field select:focus {
-  border-color: rgba(0,229,255,0.35);
-}
-
-.form-field select option { background: #13131F; }
-.form-field textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
-
-.form-submit {
-  width: 100%;
-  padding: 16px;
-  background: var(--cyan);
-  color: var(--bg);
-  border: none;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s;
-  margin-top: 8px;
-}
-
-.form-submit:hover {
-  background: #33EAFF;
-  box-shadow: 0 0 40px var(--cyan-glow);
-}
-
-.form-note {
-  text-align: center;
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 14px;
-}
-
-/* ─── FOOTER ─── */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 40px 6%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.02em;
-}
-
-.footer-logo span { color: var(--cyan); }
-
-.footer-copy {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.footer-links {
-  display: flex;
-  gap: 24px;
-}
-
-.footer-links a {
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.footer-links a:hover { color: var(--text); }
-
-/* ─── SCROLL REVEAL ─── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ─── MOBILE ─── */
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .how-grid { grid-template-columns: 1fr; gap: 40px; }
-  .about-inner { grid-template-columns: 1fr; gap: 40px; }
-  .form-row { grid-template-columns: 1fr; }
-  .hero-stats { gap: 28px; }
-  footer { flex-direction: column; text-align: center; }
-  .footer-links { justify-content: center; }
+@media(max-width:768px) {
+  .nav-links { display:none; }
+  .about-inner { grid-template-columns:1fr; gap:40px; }
+  .demos-grid { grid-template-columns:1fr; }
+  .form-row { grid-template-columns:1fr; }
+  .stats-inner { flex-wrap:wrap; }
+  .stat { flex:1 1 50%; border-bottom:1px solid var(--border); }
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ══════════ LOADER ══════════ -->
+<div id="loader">
+  <canvas id="loaderCanvas"></canvas>
+  <div class="loader-content">
+    <div class="loader-logo">Kronos<span>AI</span></div>
+    <div class="loader-sub">Intelligent Automation</div>
+    <div class="loader-progress"><div class="loader-progress-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN SITE ══════════ -->
+<div id="mainSite">
+
 <nav>
-  <a href="#" class="nav-logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="18,3 33,12 33,24 18,33 3,24 3,12" fill="none" stroke="#00E5FF" stroke-width="1.5"/>
-        <polygon points="18,9 27,14.5 27,21.5 18,27 9,21.5 9,14.5" fill="rgba(0,229,255,0.1)" stroke="#00E5FF" stroke-width="1"/>
-        <circle cx="18" cy="18" r="3" fill="#00E5FF"/>
-      </svg>
-    </div>
-    <span class="logo-text">Kronos<span>AI</span></span>
-  </a>
+  <a href="#" class="nav-logo">Kronos<span>AI</span></a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
-    <li><a href="#how">How It Works</a></li>
+    <li><a href="#demos">Demos</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact" class="nav-cta">Get Started</a></li>
@@ -979,263 +411,104 @@ footer {
 
 <!-- HERO -->
 <section class="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <canvas id="heroCanvas"></canvas>
   <div class="hero-inner">
-    <div class="hero-badge">
-      <div class="badge-dot"></div>
-      New Zealand's AI Automation Agency
-    </div>
+    <div class="hero-badge"><div class="badge-dot"></div>NZ AI Automation Agency</div>
     <h1>
-      Your Business.<br>
-      <span class="accent">Automated.</span><br>
-      <span class="dim">Finally.</span>
+      <span class="line1">Your Business.</span>
+      <span class="line2">Automated. Finally.</span>
     </h1>
-    <p class="hero-sub">
-      Kronos AI builds custom AI chatbots, virtual receptionists, and end-to-end automated workflows — so your team stops doing repetitive work and starts doing what actually matters.
-    </p>
-    <div class="hero-actions">
-      <a href="#contact" class="btn-primary">Book a Free Strategy Call</a>
+    <p>We build AI chatbots, virtual receptionists, smart websites, and automated workflows — so your business runs 24/7 without you having to be there.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Book a Free Chat</a>
       <a href="#demos" class="btn-secondary">See Live Demos →</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num">70<span>%</span></div>
-        <div class="stat-label">Reduction in manual tasks</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">24<span>/7</span></div>
-        <div class="stat-label">Your AI works non-stop</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">14<span>d</span></div>
-        <div class="stat-label">Average time to go live</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">NZ<span>🇳🇿</span></div>
-        <div class="stat-label">Local support, global tech</div>
-      </div>
     </div>
   </div>
 </section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat reveal"><div class="stat-num">70%</div><div class="stat-lbl">Less Admin</div></div>
+    <div class="stat reveal"><div class="stat-num">24/7</div><div class="stat-lbl">Always On</div></div>
+    <div class="stat reveal"><div class="stat-num">14 Days</div><div class="stat-lbl">To Go Live</div></div>
+    <div class="stat reveal"><div class="stat-num">NZ 🇳🇿</div><div class="stat-lbl">Local Support</div></div>
+  </div>
+</div>
 
 <!-- SERVICES -->
 <section class="services" id="services">
-  <div class="services-header reveal">
+  <div class="reveal">
     <div class="section-label">What We Build</div>
-    <h2 class="section-title">AI Solutions That Actually Work</h2>
-    <p class="section-sub">Not templates. Not off-the-shelf tools. Custom AI built specifically for your business, your customers, your workflows.</p>
+    <h2 class="section-title">AI That Works For You</h2>
+    <p class="section-sub">Practical tools that save time from day one. No tech knowledge needed — we handle everything.</p>
   </div>
-  <div class="services-grid">
-    <div class="service-card reveal">
-      <div class="service-icon">🤖</div>
-      <h3>AI Chatbots</h3>
-      <p>Intelligent conversational agents that handle customer enquiries, qualify leads, book appointments, and answer FAQs — around the clock, with zero wait time.</p>
-      <div class="service-price">
-        <span class="price-setup">$1,500</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $300/mo retainer</span>
-      </div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">📞</div>
-      <h3>Virtual Receptionists</h3>
-      <p>AI-powered front-of-house that greets, screens, and routes enquiries. Integrates with your calendar, CRM, and email so nothing falls through the cracks.</p>
-      <div class="service-price">
-        <span class="price-setup">$2,000</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $400/mo retainer</span>
-      </div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">⚡</div>
-      <h3>Automated Workflows</h3>
-      <p>End-to-end process automation — lead capture to CRM, invoice generation, follow-up sequences, reporting, and more. Your ops on autopilot.</p>
-      <div class="service-price">
-        <span class="price-setup">$1,000</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $200/mo retainer</span>
-      </div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🎯</div>
-      <h3>Lead Generation Agents</h3>
-      <p>AI agents that find, qualify, and warm up prospects automatically. Integrates with your outreach tools so your pipeline fills itself while you sleep.</p>
-      <div class="service-price">
-        <span class="price-setup">$2,500</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $500/mo retainer</span>
-      </div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">📊</div>
-      <h3>AI-Powered CRM</h3>
-      <p>Transform your existing CRM with AI — automatic data entry, smart follow-up scheduling, sentiment analysis, and deal scoring. Never miss a lead again.</p>
-      <div class="service-price">
-        <span class="price-setup">$1,800</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $350/mo retainer</span>
-      </div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🛠️</div>
-      <h3>Custom AI Solutions</h3>
-      <p>Got a specific problem? We build bespoke AI systems tailored to your exact needs — document processing, internal tools, complex multi-step automations.</p>
-      <div class="service-price">
-        <span class="price-setup">From $3,000</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">retainer on request</span>
-      </div>
-    </div>
-    <div class="service-card reveal" style="border-color:rgba(0,229,255,0.2);position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00E5FF,#7C3AED);"></div>
-      <div style="position:absolute;top:12px;right:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);border-radius:100px;padding:3px 10px;font-size:10px;color:#00E5FF;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">New</div>
-      <div class="service-icon">🌐</div>
-      <h3>AI Smart Website</h3>
-      <p>We build your business a professional website with AI already built in — chatbot, lead capture, and automated follow-up. Not just a website. A 24/7 sales machine.</p>
-      <div class="service-price">
-        <span class="price-setup">From $1,500</span>
-        <span class="price-divider">|</span>
-        <span class="price-monthly">from $200/mo retainer</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div style="max-width:1000px;margin:0 auto;">
-    <div class="reveal">
-      <div class="section-label">The Process</div>
-      <h2 class="section-title">Live in 2 Weeks,<br>Not 6 Months</h2>
-    </div>
-    <div class="how-grid">
-      <div class="how-steps">
-        <div class="how-step reveal">
-          <div class="step-num">01</div>
-          <div class="step-content">
-            <h4>Free Strategy Call</h4>
-            <p>We map out your biggest time-wasters and identify exactly where AI can save you the most money. No sales pitch — just a honest breakdown.</p>
-          </div>
-        </div>
-        <div class="how-step reveal">
-          <div class="step-num">02</div>
-          <div class="step-content">
-            <h4>Custom Proposal</h4>
-            <p>You receive a detailed proposal within 24 hours — exactly what we'll build, what it will do, timeline, and fixed pricing. No surprises.</p>
-          </div>
-        </div>
-        <div class="how-step reveal">
-          <div class="step-num">03</div>
-          <div class="step-content">
-            <h4>We Build It</h4>
-            <p>Our team builds and tests your custom AI solution. You get regular updates and can provide feedback throughout. Average build time: 1–2 weeks.</p>
-          </div>
-        </div>
-        <div class="how-step reveal">
-          <div class="step-num">04</div>
-          <div class="step-content">
-            <h4>Launch & Ongoing Support</h4>
-            <p>We go live, train your team, and monitor performance. Your monthly retainer covers ongoing improvements, maintenance, and support.</p>
-          </div>
-        </div>
-      </div>
-      <div class="how-visual reveal">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:20px;">Live Demo Preview</div>
-        <div class="visual-chat">
-          <div>
-            <div class="chat-label">AI Receptionist</div>
-            <div class="chat-bubble bot">Kia ora! Welcome to Hamilton Dental. I'm your AI assistant — I can book appointments, answer questions, or connect you with our team. How can I help?</div>
-          </div>
-          <div class="chat-bubble user">Do you have anything available this Friday afternoon?</div>
-          <div class="chat-bubble bot">I have a couple of options this Friday — 2:00pm or 3:30pm with Dr. Patel. Which works best for you, and is this for a checkup or something specific?</div>
-          <div class="chat-bubble user">2pm works, just a checkup</div>
-          <div class="chat-bubble bot">Perfect! I've booked you in for Friday at 2:00pm with Dr. Patel for a standard checkup. You'll get a confirmation text shortly. Anything else I can help with? 😊</div>
-        </div>
-      </div>
-    </div>
+  <div class="svc-grid">
+    <div class="svc-card reveal"><span class="svc-emoji">🤖</span><h3>AI Chatbot</h3><p>Answers customer questions instantly, any time of day or night. No more missed enquiries.</p><div class="svc-price">From $1,500 + $300/mo</div></div>
+    <div class="svc-card reveal"><span class="svc-emoji">📞</span><h3>Virtual Receptionist</h3><p>Books appointments and handles enquiries. Like a receptionist who never takes a day off.</p><div class="svc-price">From $2,000 + $400/mo</div></div>
+    <div class="svc-card reveal"><span class="svc-emoji">🌐</span><h3>AI Smart Website</h3><p>A professional website with AI built in from day one — chatbot, lead capture, automated follow-up.</p><div class="svc-price">From $1,500 + $200/mo</div></div>
+    <div class="svc-card reveal"><span class="svc-emoji">⚡</span><h3>Automated Workflows</h3><p>Invoices, follow-ups, reminders — all handled automatically without lifting a finger.</p><div class="svc-price">From $1,000 + $200/mo</div></div>
+    <div class="svc-card reveal"><span class="svc-emoji">🎯</span><h3>Lead Generation</h3><p>AI finds and contacts new customers for you. Wake up to a full inbox of warm leads.</p><div class="svc-price">From $2,500 + $500/mo</div></div>
+    <div class="svc-card reveal"><span class="svc-emoji">🛠️</span><h3>Custom AI Solutions</h3><p>Got a specific problem? We build bespoke AI systems tailored to your exact needs.</p><div class="svc-price">From $3,000 + retainer</div></div>
   </div>
 </section>
 
 <!-- DEMOS -->
 <section class="demos" id="demos">
-  <div class="demos-header reveal">
-    <div class="section-label">See It In Action</div>
-    <h2 class="section-title">Live Demos</h2>
-    <p class="section-sub">Try our AI systems yourself. These are real, working examples of what we build for clients.</p>
+  <div class="reveal">
+    <div class="section-label">Live Demos</div>
+    <h2 class="section-title">Try It Yourself</h2>
+    <p class="section-sub">Real AI systems — see exactly what your customers would experience.</p>
   </div>
   <div class="demos-grid">
-    <a href="waikato_ai_advisor.html" class="demo-card">
-      <span class="demo-emoji">🎓</span>
-      <h3>University Student Advisor</h3>
-      <p>AI assistant handling student enquiries about enrolments, deadlines, and campus services 24/7.</p>
-      <span class="demo-tag">Try Live →</span>
-    </a>
-    <a href="demo-dental.html" class="demo-card">
-      <span class="demo-emoji">🦷</span>
-      <h3>Dental Clinic Receptionist</h3>
-      <p>Books appointments, answers FAQs, and handles patient enquiries automatically — no hold music.</p>
-      <span class="demo-tag">Try Live →</span>
-    </a>
-    <a href="demo-realestate.html" class="demo-card">
-      <span class="demo-emoji">🏠</span>
-      <h3>Real Estate Lead Qualifier</h3>
-      <p>Qualifies buyers and sellers, books viewings, and feeds hot leads directly into your CRM.</p>
-      <span class="demo-tag">Try Live →</span>
-    </a>
+    <a href="waikato_ai_advisor.html" class="demo-card reveal"><span class="demo-em">🎓</span><h3>University Advisor</h3><p>Handles student queries 24/7 automatically</p><span class="demo-try">Try live →</span></a>
+    <a href="demo-dental.html" class="demo-card reveal"><span class="demo-em">🦷</span><h3>Dental Receptionist</h3><p>Books appointments and answers FAQs</p><span class="demo-try">Try live →</span></a>
+    <a href="demo-realestate.html" class="demo-card reveal"><span class="demo-em">🏠</span><h3>Real Estate Agent</h3><p>Qualifies leads and books viewings</p><span class="demo-try">Try live →</span></a>
   </div>
 </section>
 
 <!-- PRICING -->
-<section id="pricing">
-  <div style="text-align:center;" class="reveal">
-    <div class="section-label">Transparent Pricing</div>
+<section class="pricing" id="pricing">
+  <div class="reveal" style="text-align:center">
+    <div class="section-label">Pricing</div>
     <h2 class="section-title">Simple. Fixed. No Surprises.</h2>
-    <p class="section-sub" style="margin:0 auto;">One-time setup fee to build your system. Monthly retainer to keep it running, improving, and supported.</p>
+    <p class="section-sub" style="margin:0 auto">One setup fee to build it. One monthly fee to keep it running.</p>
   </div>
-  <div class="pricing-grid">
-    <div class="pricing-card reveal">
-      <h3>Starter</h3>
-      <p style="font-size:13px;color:var(--muted);margin-top:4px;">Perfect for small businesses getting started with AI</p>
-      <div class="price">$1,500 <span>setup</span></div>
-      <div class="price-note">+ $300/month retainer</div>
-      <ul class="pricing-features">
-        <li>AI chatbot or FAQ bot</li>
-        <li>Website or WhatsApp integration</li>
-        <li>Up to 500 conversations/month</li>
-        <li>Monthly performance report</li>
-        <li>Email support</li>
+  <div class="pricing-grid" style="margin:52px auto 0">
+    <div class="price-card reveal">
+      <h3>Starter</h3><div class="price-sub">Small businesses getting started</div>
+      <div class="price-amount">$1,500 <span>setup</span></div>
+      <div class="price-mo">+ $300/month</div>
+      <ul class="price-features">
+        <li>AI chatbot for your website</li><li>Answers customer questions</li>
+        <li>Up to 500 chats/month</li><li>Monthly report</li><li>Email support</li>
       </ul>
-      <button class="pricing-btn outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      <button class="price-btn ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
     </div>
-    <div class="pricing-card featured reveal">
+    <div class="price-card featured reveal">
       <div class="featured-badge">Most Popular</div>
-      <h3>Professional</h3>
-      <p style="font-size:13px;color:var(--muted);margin-top:4px;">For growing businesses that want serious automation</p>
-      <div class="price">$3,000 <span>setup</span></div>
-      <div class="price-note">+ $600/month retainer</div>
-      <ul class="pricing-features">
-        <li>AI receptionist + workflow automation</li>
-        <li>CRM & calendar integration</li>
-        <li>Unlimited conversations</li>
-        <li>Lead qualification & routing</li>
-        <li>Monthly strategy call</li>
-        <li>Priority support</li>
+      <h3>Professional</h3><div class="price-sub">For businesses ready to automate</div>
+      <div class="price-amount">$3,000 <span>setup</span></div>
+      <div class="price-mo">+ $600/month</div>
+      <ul class="price-features">
+        <li>AI receptionist + chatbot</li><li>Booking & calendar integration</li>
+        <li>Unlimited conversations</li><li>Lead capture & follow-up</li>
+        <li>Monthly strategy call</li><li>Priority support</li>
       </ul>
-      <button class="pricing-btn solid" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      <button class="price-btn solid" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
     </div>
-    <div class="pricing-card reveal">
-      <h3>Enterprise</h3>
-      <p style="font-size:13px;color:var(--muted);margin-top:4px;">Custom solutions for complex operations</p>
-      <div class="price" style="font-size:32px;">Custom</div>
-      <div class="price-note">Scoped to your requirements</div>
-      <ul class="pricing-features">
-        <li>Full custom AI system build</li>
-        <li>Multi-department automation</li>
-        <li>Custom integrations & API work</li>
-        <li>Dedicated account manager</li>
-        <li>SLA guarantee</li>
-        <li>On-site training available</li>
+    <div class="price-card reveal">
+      <h3>Custom</h3><div class="price-sub">Complex or multi-location businesses</div>
+      <div class="price-amount" style="font-size:28px">Let's Talk</div>
+      <div class="price-mo">Scoped to your needs</div>
+      <ul class="price-features">
+        <li>Fully custom AI build</li><li>Multiple automations</li>
+        <li>CRM & system integrations</li><li>Dedicated support</li><li>Team training</li>
       </ul>
-      <button class="pricing-btn outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Talk to Us</button>
+      <button class="price-btn ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Talk to Us</button>
     </div>
   </div>
 </section>
@@ -1243,127 +516,358 @@ footer {
 <!-- ABOUT -->
 <section class="about" id="about">
   <div class="about-inner">
-    <div class="about-text reveal">
+    <div class="reveal">
       <div class="section-label">About Kronos AI</div>
       <h2 class="section-title">Built by Someone Who Gets It</h2>
-      <p>Kronos AI was founded by <strong>Kieron (Ron)</strong>, a New Zealand-based AI automation specialist who saw firsthand how much time businesses waste on repetitive, manual work that machines can do better.</p>
-      <p>We're not a big agency with layers of account managers and inflated fees. We're a lean, technical team that builds real AI solutions, delivers fast, and stays hands-on. <strong>Your success is literally our business model.</strong></p>
-      <p>Based in Waikato, we work with businesses across New Zealand — from local trades and healthcare to education and real estate. If you're doing something manually that could be automated, we want to talk.</p>
-      <a href="#contact" class="btn-primary" style="display:inline-block;margin-top:12px;">Start the Conversation</a>
+      <p>Hey, I'm <strong>Kieron (Ron)</strong> — I started Kronos AI because I kept seeing great local businesses drowning in admin work that AI can handle automatically.</p>
+      <p>We're lean, fast, and hands-on. No jargon, no overcomplicated setup. We build your AI system, get it live in 2 weeks, and stay in your corner every month after that.</p>
+      <p>Based in <strong>Hamilton, Waikato</strong> — working with businesses across New Zealand.</p>
+      <a href="#contact" class="btn-primary" style="display:inline-block;margin-top:16px">Let's Have a Chat</a>
     </div>
-    <div class="about-highlights reveal">
-      <div class="highlight">
-        <div class="highlight-icon">🇳🇿</div>
-        <div>
-          <div class="highlight-text">New Zealand Based</div>
-          <div class="highlight-sub">Local support, local time zone, real humans</div>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="highlight-icon">⚡</div>
-        <div>
-          <div class="highlight-text">Fast Delivery</div>
-          <div class="highlight-sub">Most projects live within 2 weeks</div>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="highlight-icon">🔧</div>
-        <div>
-          <div class="highlight-text">Fully Custom Builds</div>
-          <div class="highlight-sub">No templates — built for your exact business</div>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="highlight-icon">📈</div>
-        <div>
-          <div class="highlight-text">Ongoing Optimisation</div>
-          <div class="highlight-sub">Monthly retainer means it keeps getting better</div>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="highlight-icon">🔒</div>
-        <div>
-          <div class="highlight-text">Secure & Reliable</div>
-          <div class="highlight-sub">Enterprise-grade AI infrastructure</div>
-        </div>
-      </div>
+    <div class="highlight-list reveal">
+      <div class="hl"><span class="hl-icon">🇳🇿</span><div><div class="hl-text">New Zealand Based</div><div class="hl-sub">Local support, your timezone, real humans</div></div></div>
+      <div class="hl"><span class="hl-icon">⚡</span><div><div class="hl-text">Fast Delivery</div><div class="hl-sub">Most projects live within 2 weeks</div></div></div>
+      <div class="hl"><span class="hl-icon">🔧</span><div><div class="hl-text">Fully Custom Builds</div><div class="hl-sub">Built specifically for your business</div></div></div>
+      <div class="hl"><span class="hl-icon">📈</span><div><div class="hl-text">Ongoing Optimisation</div><div class="hl-sub">Monthly retainer keeps it improving</div></div></div>
+      <div class="hl"><span class="hl-icon">💬</span><div><div class="hl-text">Plain English Always</div><div class="hl-sub">No tech jargon, ever</div></div></div>
     </div>
   </div>
 </section>
 
 <!-- CONTACT -->
-<section id="contact">
-  <div class="contact">
+<section class="contact" id="contact">
+  <div class="contact-inner">
     <div class="reveal">
       <div class="section-label">Get In Touch</div>
-      <h2 class="section-title">Ready to Automate?</h2>
-      <p class="section-sub" style="margin:0 auto;">Book a free 30-minute strategy call. We'll identify exactly where AI can save your business time and money — no obligation.</p>
+      <h2 class="section-title">Book a Free Chat</h2>
+      <p style="font-size:15px;color:var(--muted);line-height:1.7;font-weight:300">30 minutes. No pressure. We'll show you exactly what AI can do for your business.</p>
     </div>
-    <form class="contact-form reveal" action="https://formspree.io/f/mykvbvqn" method="POST" onsubmit="handleSubmit(event)">
+    <form class="contact-card reveal" action="https://formspree.io/f/mykvbvqn" method="POST" onsubmit="handleSubmit(event)">
       <div class="form-row">
-        <div class="form-field">
-          <label>First Name</label>
-          <input type="text" name="name" placeholder="Your name" required />
-        </div>
-        <div class="form-field">
-          <label>Business Name</label>
-          <input type="text" name="business" placeholder="Your business" required />
-        </div>
+        <div class="form-field"><label>Your Name</label><input type="text" name="name" placeholder="Your name" required /></div>
+        <div class="form-field"><label>Business</label><input type="text" name="business" placeholder="Business name" required /></div>
       </div>
-      <div class="form-field">
-        <label>Email Address</label>
-        <input type="email" name="email" placeholder="you@yourbusiness.com" required />
-      </div>
+      <div class="form-field"><label>Email</label><input type="email" name="email" placeholder="you@yourbusiness.co.nz" required /></div>
       <div class="form-field">
         <label>Industry</label>
-        <select name="industry">
-          <option value="">Select your industry...</option>
-          <option>Education</option>
-          <option>Real Estate</option>
-          <option>Healthcare / Medical</option>
-          <option>Legal</option>
-          <option>Trades & Construction</option>
-          <option>Hospitality</option>
-          <option>Retail & E-commerce</option>
-          <option>Finance</option>
-          <option>Other</option>
-        </select>
+        <select name="industry"><option value="">Select industry...</option><option>Trades & Construction</option><option>Healthcare / Dental</option><option>Real Estate</option><option>Hospitality</option><option>Legal</option><option>Education</option><option>Retail</option><option>Other</option></select>
       </div>
-      <div class="form-field">
-        <label>What's Your Biggest Time Waster Right Now?</label>
-        <textarea name="message" placeholder="e.g. Answering the same customer questions over and over, manually entering data, chasing leads..."></textarea>
-      </div>
-      <button type="submit" class="form-submit" id="submitBtn">Book My Free Strategy Call →</button>
-      <p class="form-note">🔒 No spam. No sales pressure. Just an honest conversation about what AI can do for your business.</p>
+      <div class="form-field"><label>Biggest time waster?</label><textarea name="message" placeholder="e.g. Answering the same questions, chasing invoices, manual bookings..."></textarea></div>
+      <button type="submit" class="submit-btn" id="submitBtn">Book My Free Chat →</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">🔒 No spam. Just an honest chat about what AI can do for you.</p>
     </form>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-logo">Kronos<span>AI</span></div>
-  <div class="footer-copy">© 2026 Kronos AI · New Zealand · All rights reserved</div>
-  <div class="footer-links">
-    <a href="#services">Services</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#contact">Contact</a>
-  </div>
+  <div class="footer-copy">© 2026 Kronos AI · Hamilton, New Zealand</div>
+  <div class="footer-links"><a href="#services">Services</a><a href="#demos">Demos</a><a href="#contact">Contact</a></div>
 </footer>
 
-<script>
-// Scroll reveal
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.12 });
+</div><!-- end mainSite -->
 
+<script>
+// ═══════════════════════════════════════
+// LOADER — WORMHOLE / SPACE ANIMATION
+// ═══════════════════════════════════════
+const loaderCanvas = document.getElementById('loaderCanvas');
+const lctx = loaderCanvas.getContext('2d');
+let loaderW, loaderH, loaderFrame = 0;
+let loaderRunning = true;
+
+function resizeLoader() {
+  loaderW = loaderCanvas.width = window.innerWidth;
+  loaderH = loaderCanvas.height = window.innerHeight;
+}
+resizeLoader();
+
+// Stars
+const stars = Array.from({length:400}, () => ({
+  x: Math.random() * 2 - 1,
+  y: Math.random() * 2 - 1,
+  z: Math.random(),
+  size: Math.random() * 2 + 0.5,
+  speed: Math.random() * 0.008 + 0.002,
+  hue: Math.random() * 60 + 180,
+}));
+
+// Wormhole rings
+const rings = Array.from({length:20}, (_, i) => ({
+  radius: (i / 20) * 0.8 + 0.05,
+  rotation: Math.random() * Math.PI * 2,
+  rotSpeed: (Math.random() - .5) * 0.01,
+  tilt: (Math.random() - .5) * .4,
+  color: i % 3 === 0 ? '#00D4FF' : i % 3 === 1 ? '#7B2FFF' : '#FFB800',
+  alpha: 0.1 + (i/20) * 0.3,
+}));
+
+function drawLoader() {
+  if (!loaderRunning) return;
+  loaderFrame++;
+
+  lctx.fillStyle = `rgba(0,0,0,${loaderFrame < 30 ? 1 : 0.15})`;
+  lctx.fillRect(0, 0, loaderW, loaderH);
+
+  const cx = loaderW / 2, cy = loaderH / 2;
+  const maxR = Math.min(loaderW, loaderH) * 0.45;
+
+  // Deep space glow
+  const deepGlow = lctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 1.2);
+  deepGlow.addColorStop(0, 'rgba(123,47,255,0.15)');
+  deepGlow.addColorStop(0.4, 'rgba(0,212,255,0.06)');
+  deepGlow.addColorStop(1, 'transparent');
+  lctx.fillStyle = deepGlow;
+  lctx.fillRect(0, 0, loaderW, loaderH);
+
+  // Wormhole tunnel
+  for (let i = rings.length - 1; i >= 0; i--) {
+    const ring = rings[i];
+    ring.rotation += ring.rotSpeed;
+    const t = (loaderFrame * 0.008 + i * 0.15) % 1;
+    const r = maxR * ring.radius * (0.3 + t * 0.7);
+    const perspective = 1 - ring.radius * 0.5;
+
+    lctx.save();
+    lctx.translate(cx, cy);
+    lctx.scale(1, perspective * 0.4 + 0.2);
+    lctx.rotate(ring.rotation + loaderFrame * 0.003);
+
+    // Ring glow
+    lctx.shadowBlur = 20;
+    lctx.shadowColor = ring.color;
+    lctx.strokeStyle = ring.color;
+    lctx.globalAlpha = ring.alpha * (0.5 + 0.5 * Math.sin(loaderFrame * 0.05 + i));
+    lctx.lineWidth = 1.5;
+    lctx.beginPath();
+    lctx.ellipse(0, 0, r, r * 0.3, ring.tilt, 0, Math.PI * 2);
+    lctx.stroke();
+
+    // Ring segments
+    for (let j = 0; j < 8; j++) {
+      const a = (j / 8) * Math.PI * 2 + ring.rotation;
+      const sx = Math.cos(a) * r;
+      const sy = Math.sin(a) * r * 0.3;
+      lctx.fillStyle = ring.color;
+      lctx.globalAlpha = ring.alpha * 0.8;
+      lctx.beginPath();
+      lctx.arc(sx, sy, 2, 0, Math.PI * 2);
+      lctx.fill();
+    }
+
+    lctx.restore();
+  }
+
+  // Flying stars toward viewer
+  lctx.shadowBlur = 0;
+  stars.forEach(star => {
+    star.z -= star.speed * (1 + loaderFrame * 0.001);
+    if (star.z <= 0) {
+      star.z = 1;
+      star.x = Math.random() * 2 - 1;
+      star.y = Math.random() * 2 - 1;
+    }
+
+    const px = (star.x / star.z) * maxR + cx;
+    const py = (star.y / star.z) * maxR * 0.6 + cy;
+    const size = star.size * (1 - star.z) * 3;
+    const alpha = (1 - star.z) * 0.9;
+
+    if (px < 0 || px > loaderW || py < 0 || py > loaderH) return;
+
+    // Star trail
+    const trailLen = size * 8;
+    const trailX = (star.x / (star.z + star.speed * 3)) * maxR + cx;
+    const trailY = (star.y / (star.z + star.speed * 3)) * maxR * 0.6 + cy;
+    const grad = lctx.createLinearGradient(trailX, trailY, px, py);
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(1, `hsla(${star.hue},100%,80%,${alpha})`);
+    lctx.strokeStyle = grad;
+    lctx.lineWidth = size * 0.5;
+    lctx.globalAlpha = 1;
+    lctx.beginPath();
+    lctx.moveTo(trailX, trailY);
+    lctx.lineTo(px, py);
+    lctx.stroke();
+
+    // Star dot
+    lctx.fillStyle = `hsla(${star.hue},100%,90%,${alpha})`;
+    lctx.shadowBlur = size * 4;
+    lctx.shadowColor = `hsla(${star.hue},100%,80%,0.8)`;
+    lctx.beginPath();
+    lctx.arc(px, py, size * 0.6, 0, Math.PI * 2);
+    lctx.fill();
+    lctx.shadowBlur = 0;
+  });
+
+  // Central void
+  const voidGrad = lctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.12);
+  voidGrad.addColorStop(0, 'rgba(0,0,0,0.95)');
+  voidGrad.addColorStop(0.6, 'rgba(0,0,0,0.6)');
+  voidGrad.addColorStop(1, 'transparent');
+  lctx.globalAlpha = 1;
+  lctx.fillStyle = voidGrad;
+  lctx.beginPath();
+  lctx.arc(cx, cy, maxR * 0.15, 0, Math.PI * 2);
+  lctx.fill();
+
+  requestAnimationFrame(drawLoader);
+}
+
+drawLoader();
+
+// Progress bar & exit
+let progress = 0;
+const progressInterval = setInterval(() => {
+  progress += Math.random() * 4 + 1;
+  if (progress > 100) progress = 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  if (progress >= 100) {
+    clearInterval(progressInterval);
+    setTimeout(exitLoader, 400);
+  }
+}, 60);
+
+function exitLoader() {
+  loaderRunning = false;
+  document.getElementById('loader').classList.add('exit');
+  document.getElementById('mainSite').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('loader').style.display = 'none';
+    initHero();
+  }, 1200);
+}
+
+// ═══════════════════════════════════════
+// HERO — SPACE / STAR FIELD ANIMATION
+// ═══════════════════════════════════════
+function initHero() {
+  const heroCanvas = document.getElementById('heroCanvas');
+  const hctx = heroCanvas.getContext('2d');
+  let heroW, heroH, heroFrame = 0;
+
+  function resizeHero() {
+    heroW = heroCanvas.width = heroCanvas.offsetWidth;
+    heroH = heroCanvas.height = heroCanvas.offsetHeight;
+  }
+  resizeHero();
+  window.addEventListener('resize', resizeHero);
+
+  // Hero star field
+  const heroStars = Array.from({length:200}, () => ({
+    x: Math.random() * heroW,
+    y: Math.random() * heroH,
+    size: Math.random() * 1.5 + 0.3,
+    speed: Math.random() * 0.3 + 0.05,
+    hue: Math.random() * 60 + 180,
+    alpha: Math.random() * 0.6 + 0.2,
+    twinkle: Math.random() * Math.PI * 2,
+  }));
+
+  // Nebula clouds
+  const nebulas = Array.from({length:5}, () => ({
+    x: Math.random() * heroW,
+    y: Math.random() * heroH,
+    r: Math.random() * 200 + 100,
+    hue: Math.random() > .5 ? 200 : 270,
+    alpha: Math.random() * 0.04 + 0.02,
+    dx: (Math.random() - .5) * 0.2,
+    dy: (Math.random() - .5) * 0.1,
+  }));
+
+  // Shooting stars
+  const shootingStars = [];
+  function spawnShootingStar() {
+    shootingStars.push({
+      x: Math.random() * heroW,
+      y: Math.random() * heroH * 0.5,
+      len: Math.random() * 120 + 60,
+      speed: Math.random() * 6 + 4,
+      angle: Math.PI / 4 + (Math.random() - .5) * 0.3,
+      alpha: 1,
+      hue: Math.random() > .5 ? 200 : 270,
+    });
+  }
+
+  function animHero() {
+    heroFrame++;
+    hctx.fillStyle = 'rgba(2,4,8,0.15)';
+    hctx.fillRect(0, 0, heroW, heroH);
+
+    // Nebulas
+    nebulas.forEach(n => {
+      n.x += n.dx; n.y += n.dy;
+      if (n.x < -n.r) n.x = heroW + n.r;
+      if (n.x > heroW + n.r) n.x = -n.r;
+      if (n.y < -n.r) n.y = heroH + n.r;
+      if (n.y > heroH + n.r) n.y = -n.r;
+      const ng = hctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+      ng.addColorStop(0, `hsla(${n.hue},100%,60%,${n.alpha})`);
+      ng.addColorStop(1, 'transparent');
+      hctx.fillStyle = ng;
+      hctx.globalAlpha = 1;
+      hctx.beginPath();
+      hctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      hctx.fill();
+    });
+
+    // Stars
+    heroStars.forEach(s => {
+      s.y -= s.speed * 0.1;
+      if (s.y < 0) { s.y = heroH; s.x = Math.random() * heroW; }
+      s.twinkle += 0.03;
+      const a = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
+      hctx.globalAlpha = a;
+      hctx.shadowBlur = s.size * 4;
+      hctx.shadowColor = `hsla(${s.hue},100%,80%,0.8)`;
+      hctx.fillStyle = `hsla(${s.hue},80%,90%,1)`;
+      hctx.beginPath();
+      hctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      hctx.fill();
+    });
+    hctx.shadowBlur = 0;
+
+    // Shooting stars
+    if (heroFrame % 90 === 0 && Math.random() > 0.3) spawnShootingStar();
+    for (let i = shootingStars.length - 1; i >= 0; i--) {
+      const ss = shootingStars[i];
+      ss.x += Math.cos(ss.angle) * ss.speed;
+      ss.y += Math.sin(ss.angle) * ss.speed;
+      ss.alpha -= 0.015;
+      if (ss.alpha <= 0 || ss.x > heroW || ss.y > heroH) { shootingStars.splice(i, 1); continue; }
+      const tx = ss.x - Math.cos(ss.angle) * ss.len;
+      const ty = ss.y - Math.sin(ss.angle) * ss.len;
+      const sg = hctx.createLinearGradient(tx, ty, ss.x, ss.y);
+      sg.addColorStop(0, 'transparent');
+      sg.addColorStop(1, `hsla(${ss.hue},100%,90%,${ss.alpha})`);
+      hctx.globalAlpha = 1;
+      hctx.strokeStyle = sg;
+      hctx.lineWidth = 1.5;
+      hctx.shadowBlur = 6;
+      hctx.shadowColor = `hsla(${ss.hue},100%,80%,0.6)`;
+      hctx.beginPath();
+      hctx.moveTo(tx, ty);
+      hctx.lineTo(ss.x, ss.y);
+      hctx.stroke();
+      hctx.shadowBlur = 0;
+    }
+
+    hctx.globalAlpha = 1;
+    requestAnimationFrame(animHero);
+  }
+
+  animHero();
+}
+
+// ═══════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, { threshold:0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Form submit
+// Form
 function handleSubmit(e) {
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Sending...';
@@ -1374,13 +878,8 @@ function handleSubmit(e) {
   }, 1500);
 }
 
-// Smooth nav
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
-  });
+window.addEventListener('resize', () => {
+  resizeLoader();
 });
 </script>
 </body>
