@@ -47,6 +47,10 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 .loader-content {
   position:relative; z-index:2;
   text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   animation:loaderPulse 2s ease infinite;
 }
 
@@ -256,11 +260,13 @@ nav {
 
 /* SERVICES */
 .services { padding:100px 6%; }
+.services-header { text-align:center; margin-bottom:56px; }
+.services-header .section-sub { margin:0 auto; }
 .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--cyan); font-weight:600; margin-bottom:12px; }
 .section-title { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; color:#fff; letter-spacing:-.02em; margin-bottom:14px; line-height:1.1; }
-.section-sub { font-size:16px; color:var(--muted); max-width:500px; line-height:1.7; margin-bottom:56px; font-weight:300; }
+.section-sub { font-size:16px; color:var(--muted); max-width:500px; line-height:1.7; font-weight:300; }
 
-.svc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:1100px; }
+.svc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:1100px; margin:0 auto; }
 .svc-card {
   background:var(--surface); border:1px solid var(--border);
   border-radius:20px; padding:32px 28px; transition:all .3s;
@@ -411,9 +417,6 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
 
 <!-- HERO -->
 <section class="hero">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
   <canvas id="heroCanvas"></canvas>
   <div class="hero-inner">
     <div class="hero-badge"><div class="badge-dot"></div>NZ AI Automation Agency</div>
@@ -441,7 +444,7 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
 
 <!-- SERVICES -->
 <section class="services" id="services">
-  <div class="reveal">
+  <div class="services-header reveal">
     <div class="section-label">What We Build</div>
     <h2 class="section-title">AI That Works For You</h2>
     <p class="section-sub">Practical tools that save time from day one. No tech knowledge needed — we handle everything.</p>
@@ -458,7 +461,7 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
 
 <!-- DEMOS -->
 <section class="demos" id="demos">
-  <div class="reveal">
+  <div class="services-header reveal">
     <div class="section-label">Live Demos</div>
     <h2 class="section-title">Try It Yourself</h2>
     <p class="section-sub">Real AI systems — see exactly what your customers would experience.</p>
@@ -764,17 +767,6 @@ function initHero() {
     twinkle: Math.random() * Math.PI * 2,
   }));
 
-  // Nebula clouds
-  const nebulas = Array.from({length:5}, () => ({
-    x: Math.random() * heroW,
-    y: Math.random() * heroH,
-    r: Math.random() * 200 + 100,
-    hue: Math.random() > .5 ? 200 : 270,
-    alpha: Math.random() * 0.04 + 0.02,
-    dx: (Math.random() - .5) * 0.2,
-    dy: (Math.random() - .5) * 0.1,
-  }));
-
   // Shooting stars
   const shootingStars = [];
   function spawnShootingStar() {
@@ -789,27 +781,15 @@ function initHero() {
     });
   }
 
+  // Clear canvas once with pure black
+  hctx.fillStyle = '#020408';
+  hctx.fillRect(0, 0, heroW, heroH);
+
   function animHero() {
     heroFrame++;
-    hctx.fillStyle = 'rgba(2,4,8,0.15)';
+    // Very subtle trail fade — keeps stars crisp
+    hctx.fillStyle = 'rgba(2,4,8,0.25)';
     hctx.fillRect(0, 0, heroW, heroH);
-
-    // Nebulas
-    nebulas.forEach(n => {
-      n.x += n.dx; n.y += n.dy;
-      if (n.x < -n.r) n.x = heroW + n.r;
-      if (n.x > heroW + n.r) n.x = -n.r;
-      if (n.y < -n.r) n.y = heroH + n.r;
-      if (n.y > heroH + n.r) n.y = -n.r;
-      const ng = hctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-      ng.addColorStop(0, `hsla(${n.hue},100%,60%,${n.alpha})`);
-      ng.addColorStop(1, 'transparent');
-      hctx.fillStyle = ng;
-      hctx.globalAlpha = 1;
-      hctx.beginPath();
-      hctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-      hctx.fill();
-    });
 
     // Stars
     heroStars.forEach(s => {
@@ -818,9 +798,9 @@ function initHero() {
       s.twinkle += 0.03;
       const a = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
       hctx.globalAlpha = a;
-      hctx.shadowBlur = s.size * 4;
-      hctx.shadowColor = `hsla(${s.hue},100%,80%,0.8)`;
-      hctx.fillStyle = `hsla(${s.hue},80%,90%,1)`;
+      hctx.shadowBlur = s.size * 3;
+      hctx.shadowColor = `hsla(${s.hue},80%,90%,0.6)`;
+      hctx.fillStyle = `hsla(${s.hue},60%,95%,1)`;
       hctx.beginPath();
       hctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
       hctx.fill();
