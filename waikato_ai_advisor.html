@@ -441,6 +441,24 @@
   }
 
   .powered-bar span { color: var(--gold); }
+
+  @media(max-width:768px) {
+    body { height:100dvh; overflow:hidden; }
+    header { padding:0 16px; height:56px; }
+    .logo-title { font-size:14px; }
+    .logo-sub { display:none; }
+    main { max-width:100%; flex-direction:column; }
+    .sidebar { display:none; }
+    .chat-area { flex:1; min-height:0; }
+    .messages { padding:16px; max-height:calc(100dvh - 56px - 80px - 32px); }
+    .msg-bubble { max-width:88%; font-size:13px; padding:11px 14px; }
+    .input-area { padding:12px 16px 14px; }
+    .chips { gap:6px; }
+    .chip { font-size:12px; padding:7px 12px; }
+    .welcome h2 { font-size:18px; }
+    .welcome p { font-size:13px; }
+    .status-pill span { display:none; }
+  }
 </style>
 </head>
 <body>
