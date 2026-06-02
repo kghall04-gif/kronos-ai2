@@ -6,393 +6,228 @@
 <title>Kronos AI — Intelligent Automation for Modern Business</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #020408;
-  --surface: #080D14;
-  --border: rgba(255,255,255,0.06);
-  --text: #E8EDF8;
-  --muted: #5A6480;
-  --cyan: #00D4FF;
-  --cyan-dim: rgba(0,212,255,0.08);
-  --purple: #7B2FFF;
-  --gold: #FFB800;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
-
-/* ══════════════════════════════
-   LOADING SCREEN
-══════════════════════════════ */
-#loader {
-  position:fixed; inset:0; z-index:9999;
-  background:#000;
-  display:flex; align-items:center; justify-content:center;
-  flex-direction:column;
-  transition:opacity 1.2s ease, transform 1.2s ease;
-}
-
-#loader.exit {
-  opacity:0;
-  transform:scale(1.1);
-  pointer-events:none;
-}
-
-#loaderCanvas {
-  position:absolute; inset:0;
-  width:100%; height:100%;
-}
-
-.loader-content {
-  position:relative; z-index:2;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  animation:loaderPulse 2s ease infinite;
-}
-
-@keyframes loaderPulse {
-  0%,100% { opacity:0.7; transform:scale(1); }
-  50% { opacity:1; transform:scale(1.02); }
-}
-
-.loader-logo {
-  font-family:'Syne',sans-serif;
-  font-size:clamp(48px,8vw,96px);
-  font-weight:800;
-  letter-spacing:-.03em;
-  color:#fff;
-  text-shadow:
-    0 0 40px rgba(0,212,255,0.8),
-    0 0 80px rgba(0,212,255,0.4),
-    0 0 120px rgba(123,47,255,0.3);
-  animation:glitchText 4s infinite;
-}
-
-.loader-logo span { color:var(--cyan); }
-
-@keyframes glitchText {
-  0%,90%,100% { text-shadow: 0 0 40px rgba(0,212,255,0.8), 0 0 80px rgba(0,212,255,0.4); transform:none; }
-  92% { text-shadow: -3px 0 #ff0080, 3px 0 #00d4ff; transform:translateX(-2px); }
-  94% { text-shadow: 3px 0 #ff0080, -3px 0 #00d4ff; transform:translateX(2px); }
-  96% { text-shadow: 0 0 40px rgba(0,212,255,0.8); transform:none; }
-}
-
-.loader-sub {
-  font-size:14px; color:rgba(255,255,255,0.4);
-  letter-spacing:.3em; text-transform:uppercase;
-  margin-top:12px;
-  animation:fadeInUp 1s ease .5s both;
-}
-
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(10px); }
-  to { opacity:1; transform:translateY(0); }
-}
-
-.loader-progress {
-  width:200px; height:2px;
-  background:rgba(255,255,255,0.1);
-  border-radius:2px; margin-top:32px;
-  overflow:hidden;
-  animation:fadeInUp 1s ease .8s both;
-}
-
-.loader-progress-fill {
-  height:100%;
-  background:linear-gradient(90deg, var(--purple), var(--cyan));
-  border-radius:2px;
-  width:0%;
-  transition:width .1s linear;
-  box-shadow:0 0 10px var(--cyan);
-}
-
-/* ══════════════════════════════
-   MAIN SITE
-══════════════════════════════ */
-#mainSite {
-  opacity:0;
-  transition:opacity 1s ease;
-}
-#mainSite.visible { opacity:1; }
-
-/* NAV */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  padding:0 6%; height:68px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:rgba(2,4,8,0.7); backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-}
-
-.nav-logo {
-  font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
-  color:#fff; letter-spacing:-.02em; text-decoration:none;
-}
-.nav-logo span { color:var(--cyan); }
-
-.nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
-.nav-links a { font-size:14px; color:var(--muted); text-decoration:none; transition:color .2s; }
-.nav-links a:hover { color:var(--text); }
-.nav-cta {
-  background:var(--cyan); color:#020408 !important;
-  padding:10px 22px; border-radius:8px; font-weight:600 !important;
-  font-size:13px !important; transition:all .2s !important;
-}
-.nav-cta:hover { box-shadow:0 0 30px rgba(0,212,255,0.4); }
-
-/* HERO */
-.hero {
-  min-height:100vh; position:relative;
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden; text-align:center;
-  padding:100px 6% 60px;
-}
-
-#heroCanvas {
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  pointer-events:none;
-}
-
-.hero-inner {
-  position:relative; z-index:2;
-  max-width:900px;
-}
-
-.hero-badge {
-  display:inline-flex; align-items:center; gap:8px;
-  background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
-  border-radius:100px; padding:8px 18px;
-  font-size:12px; color:var(--cyan); font-weight:600;
-  letter-spacing:.08em; text-transform:uppercase; margin-bottom:28px;
-  animation:fadeInUp 1s ease .3s both;
-}
-
-.badge-dot {
-  width:7px; height:7px; background:var(--cyan); border-radius:50%;
-  animation:pulse 2s infinite;
-  box-shadow:0 0 8px var(--cyan);
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-.hero h1 {
-  font-family:'Syne',sans-serif;
-  font-size:clamp(42px,6vw,88px);
-  font-weight:800; line-height:1.04;
-  letter-spacing:-.03em; color:#fff;
-  margin-bottom:22px;
-  animation:fadeInUp 1s ease .5s both;
-}
-
-.hero h1 .line1 { display:block; }
-.hero h1 .line2 {
-  display:block; color:transparent;
-  background:linear-gradient(135deg, var(--cyan), var(--purple), var(--gold));
-  -webkit-background-clip:text; background-clip:text;
-  animation:gradientShift 4s ease infinite;
-}
-
-@keyframes gradientShift {
-  0%,100% { filter:hue-rotate(0deg); }
-  50% { filter:hue-rotate(30deg); }
-}
-
-.hero p {
-  font-size:clamp(16px,2vw,20px); color:var(--muted);
-  max-width:600px; margin:0 auto 40px;
-  line-height:1.7; font-weight:300;
-  animation:fadeInUp 1s ease .7s both;
-}
-
-.hero-btns {
-  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
-  animation:fadeInUp 1s ease .9s both;
-}
-
-.btn-primary {
-  background:linear-gradient(135deg,var(--cyan),#0099CC);
-  color:#020408; padding:16px 32px; border-radius:10px;
-  font-size:15px; font-weight:700; text-decoration:none;
-  transition:all .25s; border:none; cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  box-shadow:0 0 30px rgba(0,212,255,0.3);
-}
-.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 50px rgba(0,212,255,0.5); }
-
-.btn-secondary {
-  background:transparent; color:var(--text);
-  padding:16px 32px; border-radius:10px;
-  font-size:15px; font-weight:500; text-decoration:none;
-  border:1px solid rgba(255,255,255,0.12); transition:all .25s;
-}
-.btn-secondary:hover { border-color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.04); }
-
-/* Floating orbs in hero */
-.orb {
-  position:absolute; border-radius:50%; pointer-events:none;
-  filter:blur(60px); animation:orbFloat 8s ease infinite;
-}
-.orb1 { width:400px; height:400px; background:rgba(123,47,255,0.12); top:-10%; left:-5%; animation-delay:0s; }
-.orb2 { width:300px; height:300px; background:rgba(0,212,255,0.1); bottom:10%; right:-5%; animation-delay:-3s; }
-.orb3 { width:200px; height:200px; background:rgba(255,184,0,0.06); top:40%; left:20%; animation-delay:-5s; }
-
-@keyframes orbFloat {
-  0%,100% { transform:translate(0,0) scale(1); }
-  33% { transform:translate(30px,-20px) scale(1.05); }
-  66% { transform:translate(-20px,30px) scale(.95); }
-}
-
-/* STATS */
-.stats { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-.stats-inner { display:flex; max-width:1100px; margin:0 auto; }
-.stat { flex:1; padding:32px 24px; text-align:center; border-right:1px solid var(--border); }
-.stat:last-child { border-right:none; }
-.stat-num {
-  font-family:'Syne',sans-serif; font-size:32px; font-weight:800;
-  color:var(--cyan); letter-spacing:-.02em;
-  text-shadow:0 0 20px rgba(0,212,255,0.4);
-}
-.stat-lbl { font-size:12px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.06em; }
-
-/* SERVICES */
-.services { padding:100px 6%; }
-.services-inner { max-width:1100px; margin:0 auto; }
-.services-header { text-align:center; margin-bottom:56px; }
-.services-header .section-sub { margin:0 auto; }
-.section-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--cyan); font-weight:600; margin-bottom:12px; }
-.section-title { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; color:#fff; letter-spacing:-.02em; margin-bottom:14px; line-height:1.1; }
-.section-sub { font-size:16px; color:var(--muted); max-width:500px; line-height:1.7; font-weight:300; }
-
-.svc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:1100px; margin:0 auto; }
-.svc-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:20px; padding:32px 28px; transition:all .3s;
-  position:relative; overflow:hidden;
-}
-.svc-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity:0; transition:opacity .3s;
-}
-.svc-card:hover { border-color:rgba(0,212,255,0.15); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,.4), 0 0 40px rgba(0,212,255,0.05); }
-.svc-card:hover::before { opacity:1; }
-.svc-emoji { font-size:28px; margin-bottom:18px; display:block; }
-.svc-card h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; margin-bottom:10px; }
-.svc-card p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:20px; font-weight:300; }
-.svc-price { font-size:13px; color:var(--cyan); font-weight:600; border-top:1px solid var(--border); padding-top:16px; }
-
-/* DEMOS */
-.demos { padding:100px 6%; background:var(--surface); }
-.demos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:900px; margin:52px auto 0; }
-.demo-card {
-  background:var(--bg); border:1px solid var(--border); border-radius:16px;
-  padding:28px 22px; transition:all .25s; text-decoration:none; display:block;
-  position:relative; overflow:hidden;
-}
-.demo-card::after {
-  content:''; position:absolute; inset:0;
-  background:radial-gradient(circle at 50% 0%, rgba(0,212,255,0.06), transparent 60%);
-  opacity:0; transition:opacity .3s;
-}
-.demo-card:hover { border-color:rgba(0,212,255,0.25); transform:translateY(-3px); box-shadow:0 8px 40px rgba(0,0,0,.4); }
-.demo-card:hover::after { opacity:1; }
-.demo-em { font-size:32px; margin-bottom:14px; display:block; position:relative; z-index:1; }
-.demo-card h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; position:relative; z-index:1; }
-.demo-card p { font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:14px; font-weight:300; position:relative; z-index:1; }
-.demo-try { font-size:12px; color:var(--cyan); font-weight:600; position:relative; z-index:1; }
-
-/* PRICING */
-.pricing { padding:100px 6%; }
-.pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; max-width:900px; margin-top:52px; }
-.price-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:24px; padding:36px 28px; position:relative;
-}
-.price-card.featured {
-  border-color:rgba(0,212,255,0.3);
-  box-shadow:0 0 60px rgba(0,212,255,0.08);
-}
-.featured-badge {
-  position:absolute; top:-13px; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,var(--purple),var(--cyan));
-  color:#fff; font-size:11px; font-weight:700; padding:4px 16px;
-  border-radius:100px; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;
-}
-.price-card h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; margin-bottom:6px; }
-.price-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
-.price-amount { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; color:#fff; letter-spacing:-.02em; margin-bottom:4px; }
-.price-amount span { font-size:16px; font-weight:400; color:var(--muted); }
-.price-mo { font-size:13px; color:var(--muted); margin-bottom:24px; }
-.price-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
-.price-features li { font-size:14px; color:var(--text); display:flex; align-items:center; gap:10px; }
-.price-features li::before { content:'✓'; color:var(--cyan); font-weight:700; }
-.price-btn { width:100%; padding:14px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; border:none; font-family:'DM Sans',sans-serif; }
-.price-btn.solid { background:linear-gradient(135deg,var(--cyan),#0099CC); color:#020408; }
-.price-btn.solid:hover { box-shadow:0 0 30px rgba(0,212,255,0.3); }
-.price-btn.ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
-.price-btn.ghost:hover { border-color:rgba(255,255,255,0.25); }
-
-/* ABOUT */
-.about { padding:100px 6%; background:var(--surface); }
-.about-inner { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; max-width:1100px; margin:0 auto; }
-.about p { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:16px; font-weight:300; }
-.about p strong { color:var(--text); }
-.highlight-list { display:flex; flex-direction:column; gap:12px; }
-.hl { display:flex; align-items:center; gap:14px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; transition:all .2s; }
-.hl:hover { border-color:rgba(0,212,255,0.15); }
-.hl-icon { font-size:20px; }
-.hl-text { font-size:14px; color:var(--text); font-weight:500; }
-.hl-sub { font-size:12px; color:var(--muted); margin-top:2px; }
-
-/* CONTACT */
-.contact { padding:100px 6%; }
-.contact-inner { max-width:580px; margin:0 auto; text-align:center; }
-.contact-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:40px; margin-top:40px; text-align:left; }
-.form-field { display:flex; flex-direction:column; gap:7px; margin-bottom:14px; }
-.form-field label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
-.form-field input, .form-field textarea, .form-field select {
-  background:var(--bg); border:1px solid var(--border); border-radius:10px;
-  padding:12px 14px; color:var(--text); font-family:'DM Sans',sans-serif;
-  font-size:14px; outline:none; transition:border-color .2s;
-}
-.form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color:rgba(0,212,255,0.35); }
-.form-field input::placeholder, .form-field textarea::placeholder { color:var(--muted); }
-.form-field select option { background:#080D14; }
-.form-field textarea { resize:vertical; min-height:90px; line-height:1.5; }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.submit-btn { width:100%; padding:15px; background:linear-gradient(135deg,var(--cyan),#0099CC); color:#020408; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:6px; }
-.submit-btn:hover { box-shadow:0 0 40px rgba(0,212,255,0.3); transform:translateY(-1px); }
-
-/* FOOTER */
-footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-.footer-logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff; }
-.footer-logo span { color:var(--cyan); }
-.footer-copy { font-size:13px; color:var(--muted); }
-.footer-links { display:flex; gap:20px; }
-.footer-links a { font-size:13px; color:var(--muted); text-decoration:none; transition:color .2s; }
-.footer-links a:hover { color:var(--text); }
-
-/* Scroll reveal */
-.reveal { opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
-.reveal.visible { opacity:1; transform:translateY(0); }
-
-@media(max-width:768px) {
-  .nav-links { display:none; }
-  .about-inner { grid-template-columns:1fr; gap:40px; }
-  .demos-grid { grid-template-columns:1fr; }
-  .form-row { grid-template-columns:1fr; }
-  .stats-inner { flex-wrap:wrap; }
-  .stat { flex:1 1 50%; border-bottom:1px solid var(--border); }
-}
+:root{--bg:#020408;--surface:#080D14;--border:rgba(255,255,255,0.06);--text:#E8EDF8;--muted:#5A6480;--cyan:#00D4FF;--cyan-dim:rgba(0,212,255,0.08);--purple:#7B2FFF;--gold:#FFB800}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+#loader{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 1.2s ease,transform 1.2s ease}
+#loader.exit{opacity:0;transform:scale(1.1);pointer-events:none}
+#loaderCanvas{position:absolute;inset:0;width:100%;height:100%}
+.loader-content{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:loaderPulse 2s ease infinite}
+@keyframes loaderPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}
+.loader-logo{font-family:'Syne',sans-serif;font-size:clamp(48px,8vw,96px);font-weight:800;letter-spacing:-.03em;color:#fff;text-shadow:0 0 40px rgba(0,212,255,0.8),0 0 80px rgba(0,212,255,0.4),0 0 120px rgba(123,47,255,0.3);animation:glitchText 4s infinite}
+.loader-logo span{color:var(--cyan)}
+@keyframes glitchText{0%,90%,100%{text-shadow:0 0 40px rgba(0,212,255,0.8),0 0 80px rgba(0,212,255,0.4);transform:none}92%{text-shadow:-3px 0 #ff0080,3px 0 #00d4ff;transform:translateX(-2px)}94%{text-shadow:3px 0 #ff0080,-3px 0 #00d4ff;transform:translateX(2px)}96%{text-shadow:0 0 40px rgba(0,212,255,0.8);transform:none}}
+.loader-sub{font-size:14px;color:rgba(255,255,255,0.4);letter-spacing:.3em;text-transform:uppercase;margin-top:12px;animation:fadeInUp 1s ease .5s both}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.loader-progress{width:200px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:32px;overflow:hidden;animation:fadeInUp 1s ease .8s both}
+.loader-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px;width:0%;transition:width .1s linear;box-shadow:0 0 10px var(--cyan)}
+#mainSite{opacity:0;transition:opacity 1s ease}#mainSite.visible{opacity:1}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 6%;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(2,4,8,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;text-decoration:none}
+.nav-logo span{color:var(--cyan)}
+.nav-links{display:flex;align-items:center;gap:24px;list-style:none}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--cyan);color:#020408 !important;padding:10px 22px;border-radius:8px;font-weight:600 !important;font-size:13px !important;transition:all .2s !important}
+.nav-cta:hover{box-shadow:0 0 30px rgba(0,212,255,0.4)}
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:100px 6% 60px}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-inner{position:relative;z-index:2;max-width:1200px;width:100%;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center}
+.hero-text{text-align:left}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:100px;padding:8px 18px;font-size:12px;color:var(--cyan);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px;animation:fadeInUp 1s ease .3s both}
+.badge-dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 8px var(--cyan)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(36px,4.5vw,68px);font-weight:800;line-height:1.04;letter-spacing:-.03em;color:#fff;margin-bottom:22px;animation:fadeInUp 1s ease .5s both}
+.hero h1 .line1{display:block}.hero h1 .line2{display:block;color:transparent;background:linear-gradient(135deg,var(--cyan),var(--purple),var(--gold));-webkit-background-clip:text;background-clip:text;animation:gradientShift 4s ease infinite}
+@keyframes gradientShift{0%,100%{filter:hue-rotate(0deg)}50%{filter:hue-rotate(30deg)}}
+.hero p{font-size:clamp(15px,1.6vw,18px);color:var(--muted);max-width:500px;margin:0 0 36px;line-height:1.7;font-weight:300;animation:fadeInUp 1s ease .7s both}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;animation:fadeInUp 1s ease .9s both}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),#0099CC);color:#020408;padding:16px 32px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:all .25s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 30px rgba(0,212,255,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(0,212,255,0.5)}
+.btn-secondary{background:transparent;color:var(--text);padding:16px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid rgba(255,255,255,0.12);transition:all .25s}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.04)}
+.orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(60px);animation:orbFloat 8s ease infinite}
+.orb1{width:400px;height:400px;background:rgba(123,47,255,0.12);top:-10%;left:-5%;animation-delay:0s}
+.orb2{width:300px;height:300px;background:rgba(0,212,255,0.1);bottom:10%;right:-5%;animation-delay:-3s}
+.orb3{width:200px;height:200px;background:rgba(255,184,0,0.06);top:40%;left:20%;animation-delay:-5s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(.95)}}
+.hero-chat{animation:fadeInUp 1s ease 1.1s both;background:var(--surface);border:1px solid rgba(0,212,255,0.2);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;height:420px;box-shadow:0 0 60px rgba(0,212,255,0.08),0 20px 80px rgba(0,0,0,0.5)}
+.chat-header{padding:14px 18px;background:rgba(0,212,255,0.05);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.chat-header-dot{width:8px;height:8px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite}
+.chat-header-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.chat-header-sub{font-size:11px;color:var(--muted)}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.chat-messages::-webkit-scrollbar{width:3px}.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.chat-msg{max-width:87%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5}
+.chat-msg.bot{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:linear-gradient(135deg,var(--purple),#5a1fd1);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-msg.typing{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);align-self:flex-start;border-bottom-left-radius:4px;padding:12px 16px}
+.typing-dots{display:flex;gap:4px;align-items:center}
+.typing-dots span{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:typingBounce 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:rgba(0,0,0,0.2)}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:rgba(0,212,255,0.35)}.chat-input::placeholder{color:var(--muted)}
+.chat-send{background:linear-gradient(135deg,var(--cyan),#0099CC);border:none;border-radius:10px;padding:9px 14px;color:#020408;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chat-send:hover{box-shadow:0 0 20px rgba(0,212,255,0.4)}
+.stats{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stats-inner{display:flex;max-width:1100px;margin:0 auto}
+.stat{flex:1;padding:32px 24px;text-align:center;border-right:1px solid var(--border)}.stat:last-child{border-right:none}
+.stat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--cyan);letter-spacing:-.02em;text-shadow:0 0 20px rgba(0,212,255,0.4)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.services{padding:100px 6%}.services-inner{max-width:1100px;margin:0 auto}
+.services-header{text-align:center;margin-bottom:56px}.services-header .section-sub{margin:0 auto}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);font-weight:600;margin-bottom:12px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:14px;line-height:1.1}
+.section-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.7;font-weight:300}
+.word-reveal .word{display:inline-block;opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .4s ease;margin-right:.22em}
+.word-reveal.visible .word{opacity:1;transform:translateY(0)}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;margin:0 auto}
+.svc-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;transition:all .3s;position:relative;overflow:hidden;cursor:pointer}
+.svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .3s}
+.svc-card:hover{border-color:rgba(0,212,255,0.2);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 40px rgba(0,212,255,0.06)}
+.svc-card:hover::before{opacity:1}
+.svc-emoji{font-size:28px;margin-bottom:18px;display:block}
+.svc-card h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:10px}
+.svc-card p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;font-weight:300}
+.svc-price{font-size:13px;color:var(--cyan);font-weight:600;border-top:1px solid var(--border);padding-top:16px}
+.svc-preview{position:absolute;inset:0;background:rgba(8,13,20,0.97);border-radius:20px;padding:22px;opacity:0;transform:scale(0.97);transition:opacity .3s,transform .3s;pointer-events:none;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:hidden}
+.svc-card:hover .svc-preview{opacity:1;transform:scale(1)}
+.preview-label{font-size:10px;color:var(--cyan);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.preview-line{background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.1);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text);transform:translateX(-16px);opacity:0;animation:none}
+.svc-card:hover .preview-line{animation:slideInLine .3s ease forwards}
+.svc-card:hover .preview-line:nth-child(2){animation-delay:.08s}
+.svc-card:hover .preview-line:nth-child(3){animation-delay:.16s}
+.svc-card:hover .preview-line:nth-child(4){animation-delay:.24s}
+@keyframes slideInLine{to{transform:translateX(0);opacity:1}}
+.preview-bot{background:rgba(0,212,255,0.08);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text);align-self:flex-start;max-width:90%}
+.preview-user{background:rgba(123,47,255,0.18);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text);align-self:flex-end;max-width:90%}
+.preview-confirm{background:rgba(0,224,150,0.08);border:1px solid rgba(0,224,150,0.18);border-radius:8px;padding:8px 12px;font-size:11px;color:#00E096;text-align:center}
+.preview-cursor{display:inline-block;width:2px;height:11px;background:var(--cyan);animation:blink .7s infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.demos{padding:100px 6%;background:var(--surface)}
+.demos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:52px auto 0}
+.demo-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:28px 22px;transition:all .25s;text-decoration:none;display:block;position:relative;overflow:hidden}
+.demo-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(0,212,255,0.06),transparent 60%);opacity:0;transition:opacity .3s}
+.demo-card:hover{border-color:rgba(0,212,255,0.25);transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.demo-card:hover::after{opacity:1}
+.demo-em{font-size:32px;margin-bottom:14px;display:block;position:relative;z-index:1}
+.demo-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;position:relative;z-index:1}
+.demo-card p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;font-weight:300;position:relative;z-index:1}
+.demo-try{font-size:12px;color:var(--cyan);font-weight:600;position:relative;z-index:1}
+.roi{padding:100px 6%}.roi-inner{max-width:920px;margin:0 auto}
+.roi-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px;margin-top:52px;position:relative;overflow:hidden}
+.roi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent)}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.roi-inputs{display:flex;flex-direction:column;gap:24px}
+.roi-input-group{display:flex;flex-direction:column;gap:8px}
+.roi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.roi-input-wrap{position:relative}
+.roi-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cyan);font-weight:700;font-size:16px;z-index:1}
+.roi-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 14px 14px 40px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;outline:none;transition:border-color .2s}
+.roi-input:focus{border-color:rgba(0,212,255,0.4)}
+.roi-slider{width:100%;margin-top:8px;accent-color:var(--cyan);cursor:pointer}
+.roi-slider-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.roi-results{display:flex;flex-direction:column;gap:14px}
+.roi-result-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:18px 22px;transition:border-color .3s}
+.roi-result-card.highlight{border-color:rgba(0,212,255,0.3);box-shadow:0 0 30px rgba(0,212,255,0.06)}
+.roi-result-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.roi-result-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--cyan);letter-spacing:-.02em}
+.roi-result-value.loss{color:#ff4466}.roi-result-value.gain{color:#00E096}
+.roi-result-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.roi-payback-bar{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:10px;overflow:hidden}
+.roi-payback-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:3px;width:0%;transition:width 1s ease;box-shadow:0 0 10px var(--cyan)}
+.configurator{padding:100px 6%;background:var(--surface)}.config-inner{max-width:860px;margin:0 auto}
+.config-card{background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:48px;margin-top:52px;position:relative;overflow:hidden}
+.config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),var(--cyan),transparent)}
+.config-steps{display:flex;align-items:center;margin-bottom:40px}
+.config-step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.config-step.active{color:var(--cyan)}.config-step.done{color:rgba(0,212,255,0.5)}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .3s;flex-shrink:0}
+.config-step.active .step-num{border-color:var(--cyan);background:rgba(0,212,255,0.1);color:var(--cyan)}
+.config-step.done .step-num{border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.08);color:rgba(0,212,255,0.7)}
+.step-divider{flex:1;height:1px;background:var(--border);margin:0 10px;min-width:16px}
+.step-divider.done{background:rgba(0,212,255,0.3)}
+.config-panel{display:none}.config-panel.active{display:block;animation:fadeInUp .4s ease}
+.config-question{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:8px}
+.config-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.config-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.config-options.cols2{grid-template-columns:repeat(2,1fr)}
+.config-opt{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:7px}
+.config-opt:hover{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.04)}
+.config-opt.selected{border-color:var(--cyan);background:rgba(0,212,255,0.08);box-shadow:0 0 20px rgba(0,212,255,0.1)}
+.config-opt-icon{font-size:24px}.config-opt-label{font-size:13px;font-weight:600;color:var(--text)}.config-opt-sub{font-size:11px;color:var(--muted)}
+.budget-display{text-align:center;margin-bottom:20px;font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--cyan);text-shadow:0 0 20px rgba(0,212,255,0.3)}
+.budget-slider{width:100%;accent-color:var(--cyan);cursor:pointer;margin-bottom:8px}
+.budget-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.config-result{background:var(--surface);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:28px;animation:fadeInUp .5s ease;box-shadow:0 0 40px rgba(0,212,255,0.06)}
+.result-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
+.result-subtitle{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.result-features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.result-feat{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text)}
+.result-feat::before{content:'✓';color:var(--cyan);font-weight:700;flex-shrink:0}
+.result-price-row{display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.result-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--cyan)}
+.result-price-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.config-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.config-back{background:transparent;border:1px solid var(--border);color:var(--muted);padding:12px 24px;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;transition:all .2s}
+.config-back:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+.config-next{background:linear-gradient(135deg,var(--cyan),#0099CC);color:#020408;border:none;padding:12px 28px;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;transition:all .2s}
+.config-next:hover{box-shadow:0 0 30px rgba(0,212,255,0.3);transform:translateY(-1px)}
+.config-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.pricing{padding:100px 6%}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin-top:52px}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px 28px;position:relative}
+.price-card.featured{border-color:rgba(0,212,255,0.3);box-shadow:0 0 60px rgba(0,212,255,0.08)}
+.featured-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;font-size:11px;font-weight:700;padding:4px 16px;border-radius:100px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.price-card h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:6px}
+.price-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.price-amount{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:4px}
+.price-amount span{font-size:16px;font-weight:400;color:var(--muted)}
+.price-mo{font-size:13px;color:var(--muted);margin-bottom:24px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.price-features li{font-size:14px;color:var(--text);display:flex;align-items:center;gap:10px}
+.price-features li::before{content:'✓';color:var(--cyan);font-weight:700}
+.price-btn{width:100%;padding:14px;border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif}
+.price-btn.solid{background:linear-gradient(135deg,var(--cyan),#0099CC);color:#020408}
+.price-btn.solid:hover{box-shadow:0 0 30px rgba(0,212,255,0.3)}
+.price-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.price-btn.ghost:hover{border-color:rgba(255,255,255,0.25)}
+.about{padding:100px 6%;background:var(--surface)}
+.about-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1100px;margin:0 auto}
+.about p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:16px;font-weight:300}
+.about p strong{color:var(--text)}
+.highlight-list{display:flex;flex-direction:column;gap:12px}
+.hl{display:flex;align-items:center;gap:14px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;transition:all .2s}
+.hl:hover{border-color:rgba(0,212,255,0.15)}
+.hl-icon{font-size:20px}.hl-text{font-size:14px;color:var(--text);font-weight:500}.hl-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.contact{padding:100px 6%}.contact-inner{max-width:580px;margin:0 auto;text-align:center}
+.contact-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;margin-top:40px;text-align:left}
+.form-field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.form-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.form-field input,.form-field textarea,.form-field select{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:rgba(0,212,255,0.35)}
+.form-field input::placeholder,.form-field textarea::placeholder{color:var(--muted)}
+.form-field select option{background:#080D14}
+.form-field textarea{resize:vertical;min-height:90px;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--cyan),#0099CC);color:#020408;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px}
+.submit-btn:hover{box-shadow:0 0 40px rgba(0,212,255,0.3);transform:translateY(-1px)}
+footer{border-top:1px solid var(--border);padding:32px 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff}
+.footer-logo span{color:var(--cyan)}
+.footer-copy{font-size:13px;color:var(--muted)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:1024px){.hero-inner{grid-template-columns:1fr;max-width:700px}.hero-text{text-align:center}.hero p{margin:0 auto 36px}.hero-btns{justify-content:center}.hero-chat{height:360px;max-width:500px;margin:0 auto;width:100%}}
+@media(max-width:768px){.nav-links{display:none}.about-inner{grid-template-columns:1fr;gap:40px}.demos-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.stats-inner{flex-wrap:wrap}.stat{flex:1 1 50%;border-bottom:1px solid var(--border)}.roi-grid{grid-template-columns:1fr}.config-options{grid-template-columns:repeat(2,1fr)}.config-options.cols2{grid-template-columns:1fr 1fr}.config-card{padding:28px 20px}}
 </style>
 </head>
 <body>
-
-<!-- ══════════ LOADER ══════════ -->
 <div id="loader">
   <canvas id="loaderCanvas"></canvas>
   <div class="loader-content">
@@ -401,153 +236,321 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
     <div class="loader-progress"><div class="loader-progress-fill" id="progressFill"></div></div>
   </div>
 </div>
-
-<!-- ══════════ MAIN SITE ══════════ -->
 <div id="mainSite">
-
 <nav>
   <a href="#" class="nav-logo">Kronos<span>AI</span></a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
     <li><a href="#demos">Demos</a></li>
+    <li><a href="#roi">ROI Calculator</a></li>
+    <li><a href="#configurator">Build Your AI</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact" class="nav-cta">Get Started</a></li>
   </ul>
 </nav>
-
-<!-- HERO -->
 <section class="hero">
   <canvas id="heroCanvas"></canvas>
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
   <div class="hero-inner">
-    <div class="hero-badge"><div class="badge-dot"></div>NZ AI Automation Agency</div>
-    <h1>
-      <span class="line1">We Build AI That Works</span>
-      <span class="line2">While You Sleeep.</span>
-    </h1>
-    <p>We build AI chatbots, virtual receptionists, smart websites, and automated workflows — so your business runs 24/7 without you having to be there.</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Book a Free Chat</a>
-      <a href="#demos" class="btn-secondary">See Live Demos →</a>
+    <div class="hero-text">
+      <div class="hero-badge"><div class="badge-dot"></div>NZ AI Automation Agency</div>
+      <h1><span class="line1">We Build AI That Works</span><span class="line2">While You Sleeep.</span></h1>
+      <p>We build AI chatbots, virtual receptionists, smart websites, and automated workflows — so your business runs 24/7 without you having to be there.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Book a Free Chat</a>
+        <a href="#demos" class="btn-secondary">See Live Demos →</a>
+      </div>
+    </div>
+    <div class="hero-chat">
+      <div class="chat-header">
+        <div class="chat-header-dot"></div>
+        <div><div class="chat-header-title">Kronos AI Assistant</div><div class="chat-header-sub">Ask what AI can do for your business</div></div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">&#x1F44B; Hi! Tell me your industry or biggest time waster and I'll show you exactly how AI can help your business.</div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" type="text" placeholder="e.g. I run a dental clinic..." maxlength="200" />
+        <button class="chat-send" id="chatSend">Send &#x2192;</button>
+      </div>
     </div>
   </div>
 </section>
-
-<!-- STATS -->
 <div class="stats">
   <div class="stats-inner">
     <div class="stat reveal"><div class="stat-num">70%</div><div class="stat-lbl">Less Admin</div></div>
     <div class="stat reveal"><div class="stat-num">24/7</div><div class="stat-lbl">Always On</div></div>
     <div class="stat reveal"><div class="stat-num">14 Days</div><div class="stat-lbl">To Go Live</div></div>
-    <div class="stat reveal"><div class="stat-num">NZ 🇳🇿</div><div class="stat-lbl">Local Support</div></div>
+    <div class="stat reveal"><div class="stat-num">NZ &#x1F1F3;&#x1F1FF;</div><div class="stat-lbl">Local Support</div></div>
   </div>
 </div>
-
-<!-- SERVICES -->
 <section class="services" id="services">
 <div class="services-inner">
   <div class="services-header reveal">
     <div class="section-label">What We Build</div>
-    <h2 class="section-title">AI That Works For You</h2>
+    <h2 class="section-title word-reveal">AI That Works For You</h2>
     <p class="section-sub">Practical tools that save time from day one. No tech knowledge needed — we handle everything.</p>
   </div>
   <div class="svc-grid">
-    <div class="svc-card reveal"><span class="svc-emoji">🤖</span><h3>AI Chatbot</h3><p>Answers customer questions instantly, any time of day or night. No more missed enquiries.</p><div class="svc-price">From $1,500 + $300/mo</div></div>
-    <div class="svc-card reveal"><span class="svc-emoji">📞</span><h3>Virtual Receptionist</h3><p>Books appointments and handles enquiries. Like a receptionist who never takes a day off.</p><div class="svc-price">From $2,000 + $400/mo</div></div>
-    <div class="svc-card reveal"><span class="svc-emoji">🌐</span><h3>AI Smart Website</h3><p>A professional website with AI built in from day one — chatbot, lead capture, automated follow-up.</p><div class="svc-price">From $1,500 + $200/mo</div></div>
-    <div class="svc-card reveal"><span class="svc-emoji">⚡</span><h3>Automated Workflows</h3><p>Invoices, follow-ups, reminders — all handled automatically without lifting a finger.</p><div class="svc-price">From $1,000 + $200/mo</div></div>
-    <div class="svc-card reveal"><span class="svc-emoji">🎯</span><h3>Lead Generation</h3><p>AI finds and contacts new customers for you. Wake up to a full inbox of warm leads.</p><div class="svc-price">From $2,500 + $500/mo</div></div>
-    <div class="svc-card reveal"><span class="svc-emoji">🛠️</span><h3>Custom AI Solutions</h3><p>Got a specific problem? We build bespoke AI systems tailored to your exact needs.</p><div class="svc-price">From $3,000 + retainer</div></div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">Live Preview</div>
+        <div class="preview-bot">Do you have emergency appointments?<div class="preview-cursor"></div></div>
+        <div class="preview-user">Yes! Same-day slots available. Book now? &#x2705;</div>
+        <div class="preview-bot">What time suits you best?</div>
+        <div style="font-size:10px;color:var(--cyan);text-align:center;margin-top:8px;opacity:.7">Answering 24/7 — no staff needed</div>
+      </div>
+      <span class="svc-emoji">&#x1F916;</span><h3>AI Chatbot</h3>
+      <p>Answers customer questions instantly, any time of day or night. No more missed enquiries.</p>
+      <div class="svc-price">From $1,500 + $300/mo</div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">Booking Confirmed</div>
+        <div class="preview-confirm">&#x2705; Appointment booked<br><span style="font-size:10px;opacity:.7">Tomorrow 2:30pm · John Smith</span></div>
+        <div class="preview-line">&#x1F4E7; Confirmation sent to client</div>
+        <div class="preview-line">&#x1F4C5; Calendar updated automatically</div>
+        <div class="preview-line">&#x23F0; Reminder scheduled for tomorrow</div>
+      </div>
+      <span class="svc-emoji">&#x1F4DE;</span><h3>Virtual Receptionist</h3>
+      <p>Books appointments and handles enquiries. Like a receptionist who never takes a day off.</p>
+      <div class="svc-price">From $2,000 + $400/mo</div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">Lead Captured</div>
+        <div class="preview-line">&#x1F310; New visitor landed on site</div>
+        <div class="preview-line">&#x1F4AC; AI greeted and qualified lead</div>
+        <div class="preview-line">&#x1F4CB; Details saved to your CRM</div>
+        <div class="preview-line">&#x1F4E4; Follow-up email sent in 30s</div>
+      </div>
+      <span class="svc-emoji">&#x1F310;</span><h3>AI Smart Website</h3>
+      <p>A professional website with AI built in from day one — chatbot, lead capture, automated follow-up.</p>
+      <div class="svc-price">From $1,500 + $200/mo</div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">Running Now</div>
+        <div class="preview-line">&#x1F9FE; Invoice sent to client #47</div>
+        <div class="preview-line">&#x23F0; Follow-up reminder in 3 days</div>
+        <div class="preview-line">&#x2705; Job completion email triggered</div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">All while you were sleeping &#x1F4A4;</div>
+      </div>
+      <span class="svc-emoji">&#x26A1;</span><h3>Automated Workflows</h3>
+      <p>Invoices, follow-ups, reminders — all handled automatically without lifting a finger.</p>
+      <div class="svc-price">From $1,000 + $200/mo</div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">This Morning</div>
+        <div class="preview-line">&#x1F3AF; 12 new leads identified</div>
+        <div class="preview-line">&#x1F4EC; Outreach sent to all 12</div>
+        <div class="preview-line">&#x1F4AC; 3 replied — meetings booked</div>
+        <div style="font-size:10px;color:#00E096;text-align:center;margin-top:6px">25% reply rate · fully automated</div>
+      </div>
+      <span class="svc-emoji">&#x1F3AF;</span><h3>Lead Generation</h3>
+      <p>AI finds and contacts new customers for you. Wake up to a full inbox of warm leads.</p>
+      <div class="svc-price">From $2,500 + $500/mo</div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-preview">
+        <div class="preview-label">Custom Build</div>
+        <div class="preview-line">&#x1F6E0;&#xFE0F; Requirements scoped</div>
+        <div class="preview-line">&#x1F916; AI system designed for you</div>
+        <div class="preview-line">&#x1F680; Live within 2 weeks</div>
+        <div class="preview-line">&#x1F4C8; Optimised every month</div>
+      </div>
+      <span class="svc-emoji">&#x1F6E0;&#xFE0F;</span><h3>Custom AI Solutions</h3>
+      <p>Got a specific problem? We build bespoke AI systems tailored to your exact needs.</p>
+      <div class="svc-price">From $3,000 + retainer</div>
+    </div>
   </div>
 </div>
 </section>
-
-<!-- DEMOS -->
 <section class="demos" id="demos">
 <div class="services-inner">
   <div class="services-header reveal">
     <div class="section-label">Live Demos</div>
-    <h2 class="section-title">Try It Yourself</h2>
+    <h2 class="section-title word-reveal">Try It Yourself</h2>
     <p class="section-sub">Real AI systems — see exactly what your customers would experience.</p>
   </div>
   <div class="demos-grid">
-    <a href="waikato_ai_advisor.html" class="demo-card reveal"><span class="demo-em">🎓</span><h3>University Advisor</h3><p>Handles student queries 24/7 automatically</p><span class="demo-try">Try live →</span></a>
-    <a href="demo-dental.html" class="demo-card reveal"><span class="demo-em">🦷</span><h3>Dental Receptionist</h3><p>Books appointments and answers FAQs</p><span class="demo-try">Try live →</span></a>
-    <a href="demo-realestate.html" class="demo-card reveal"><span class="demo-em">🏠</span><h3>Real Estate Agent</h3><p>Qualifies leads and books viewings</p><span class="demo-try">Try live →</span></a>
+    <a href="waikato_ai_advisor.html" class="demo-card reveal"><span class="demo-em">&#x1F393;</span><h3>University Advisor</h3><p>Handles student queries 24/7 automatically</p><span class="demo-try">Try live &#x2192;</span></a>
+    <a href="demo-dental.html" class="demo-card reveal"><span class="demo-em">&#x1FA77;</span><h3>Dental Receptionist</h3><p>Books appointments and answers FAQs</p><span class="demo-try">Try live &#x2192;</span></a>
+    <a href="demo-realestate.html" class="demo-card reveal"><span class="demo-em">&#x1F3E0;</span><h3>Real Estate Agent</h3><p>Qualifies leads and books viewings</p><span class="demo-try">Try live &#x2192;</span></a>
   </div>
 </div>
 </section>
-
-<!-- PRICING -->
+<section class="roi" id="roi">
+  <div class="roi-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">ROI Calculator</div>
+      <h2 class="section-title word-reveal">See What Admin Is Costing You</h2>
+      <p class="section-sub" style="margin:0 auto">Enter your numbers. Most business owners are shocked by what they find.</p>
+    </div>
+    <div class="roi-card reveal">
+      <div class="roi-grid">
+        <div class="roi-inputs">
+          <div class="roi-input-group">
+            <div class="roi-label">Your Hourly Rate</div>
+            <div class="roi-input-wrap">
+              <span class="roi-prefix">$</span>
+              <input class="roi-input" id="roiRate" type="number" value="75" min="10" max="500" />
+            </div>
+            <input class="roi-slider" id="roiRateSlider" type="range" min="10" max="500" value="75" />
+            <div class="roi-slider-labels"><span>$10/hr</span><span>$500/hr</span></div>
+          </div>
+          <div class="roi-input-group">
+            <div class="roi-label">Hours on Admin Per Week</div>
+            <div class="roi-input-wrap">
+              <span class="roi-prefix" style="font-size:13px;left:10px">hrs</span>
+              <input class="roi-input" id="roiHours" type="number" value="10" min="1" max="60" />
+            </div>
+            <input class="roi-slider" id="roiHoursSlider" type="range" min="1" max="60" value="10" />
+            <div class="roi-slider-labels"><span>1 hr</span><span>60 hrs</span></div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;padding:16px;background:rgba(0,212,255,0.03);border:1px solid var(--border);border-radius:12px">&#x1F4A1; Include time answering questions, booking appointments, chasing invoices, and manual follow-ups.</div>
+        </div>
+        <div class="roi-results">
+          <div class="roi-result-card" style="border-color:rgba(255,68,102,0.2)">
+            <div class="roi-result-label">You lose per year on admin</div>
+            <div class="roi-result-value loss" id="roiLoss">$39,000</div>
+            <div class="roi-result-sub">in billable time wasted on tasks AI handles</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Kronos AI total cost (year 1)</div>
+            <div class="roi-result-value" id="roiCost">$10,200</div>
+            <div class="roi-result-sub">Professional plan — setup + 12 months</div>
+          </div>
+          <div class="roi-result-card highlight">
+            <div class="roi-result-label">Net saving in year 1</div>
+            <div class="roi-result-value gain" id="roiSave">$28,800</div>
+            <div class="roi-result-sub">pure profit after all Kronos AI fees</div>
+            <div class="roi-payback-bar"><div class="roi-payback-fill" id="roiBar"></div></div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Kronos AI pays for itself in</div>
+            <div class="roi-result-value" id="roiPayback">96 days</div>
+            <div class="roi-result-sub">then it is pure profit every month</div>
+          </div>
+          <a href="#contact" class="btn-primary" style="display:block;text-align:center">Start Saving &#x2192;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="configurator" id="configurator">
+  <div class="config-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">AI Configurator</div>
+      <h2 class="section-title word-reveal">Build Your Custom AI</h2>
+      <p class="section-sub" style="margin:0 auto">3 quick questions. We generate your perfect AI plan with a live price estimate.</p>
+    </div>
+    <div class="config-card reveal">
+      <div class="config-steps">
+        <div class="config-step active" id="stepInd1"><div class="step-num">1</div><span>Industry</span></div>
+        <div class="step-divider" id="div1"></div>
+        <div class="config-step" id="stepInd2"><div class="step-num">2</div><span>Problem</span></div>
+        <div class="step-divider" id="div2"></div>
+        <div class="config-step" id="stepInd3"><div class="step-num">3</div><span>Budget</span></div>
+        <div class="step-divider" id="div3"></div>
+        <div class="config-step" id="stepInd4"><div class="step-num">4</div><span>Your Plan</span></div>
+      </div>
+      <div class="config-panel active" id="configStep1">
+        <div class="config-question">What industry are you in?</div>
+        <div class="config-sub">We will tailor your AI recommendation to your specific sector.</div>
+        <div class="config-options" id="industryOpts">
+          <div class="config-opt" data-val="dental"><div class="config-opt-icon">&#x1FA77;</div><div class="config-opt-label">Dental</div><div class="config-opt-sub">Clinics and practices</div></div>
+          <div class="config-opt" data-val="trades"><div class="config-opt-icon">&#x1F527;</div><div class="config-opt-label">Trades</div><div class="config-opt-sub">Construction and services</div></div>
+          <div class="config-opt" data-val="realestate"><div class="config-opt-icon">&#x1F3E0;</div><div class="config-opt-label">Real Estate</div><div class="config-opt-sub">Agents and property</div></div>
+          <div class="config-opt" data-val="hospitality"><div class="config-opt-icon">&#x1F37D;&#xFE0F;</div><div class="config-opt-label">Hospitality</div><div class="config-opt-sub">Restaurants and hotels</div></div>
+          <div class="config-opt" data-val="legal"><div class="config-opt-icon">&#x2696;&#xFE0F;</div><div class="config-opt-label">Legal</div><div class="config-opt-sub">Law firms and consultants</div></div>
+          <div class="config-opt" data-val="education"><div class="config-opt-icon">&#x1F393;</div><div class="config-opt-label">Education</div><div class="config-opt-sub">Schools and tutoring</div></div>
+        </div>
+        <div class="config-nav"><div></div><button class="config-next" id="next1" disabled onclick="goStep(2)">Next: Your Problem &#x2192;</button></div>
+      </div>
+      <div class="config-panel" id="configStep2">
+        <div class="config-question">What is your biggest time waster?</div>
+        <div class="config-sub">Pick the one that costs you the most time right now.</div>
+        <div class="config-options cols2" id="problemOpts">
+          <div class="config-opt" data-val="enquiries"><div class="config-opt-icon">&#x1F4DE;</div><div class="config-opt-label">Missed Enquiries</div><div class="config-opt-sub">Calls and messages unanswered</div></div>
+          <div class="config-opt" data-val="bookings"><div class="config-opt-icon">&#x1F4C5;</div><div class="config-opt-label">Manual Bookings</div><div class="config-opt-sub">Hours spent scheduling</div></div>
+          <div class="config-opt" data-val="followup"><div class="config-opt-icon">&#x2709;&#xFE0F;</div><div class="config-opt-label">Slow Follow-Up</div><div class="config-opt-sub">Leads going cold</div></div>
+          <div class="config-opt" data-val="repetitive"><div class="config-opt-icon">&#x1F501;</div><div class="config-opt-label">Repetitive Questions</div><div class="config-opt-sub">Same FAQs every day</div></div>
+          <div class="config-opt" data-val="leads"><div class="config-opt-icon">&#x1F3AF;</div><div class="config-opt-label">Not Enough Leads</div><div class="config-opt-sub">Pipeline running dry</div></div>
+        </div>
+        <div class="config-nav"><button class="config-back" onclick="goStep(1)">&#x2190; Back</button><button class="config-next" id="next2" disabled onclick="goStep(3)">Next: Budget &#x2192;</button></div>
+      </div>
+      <div class="config-panel" id="configStep3">
+        <div class="config-question">What is your monthly budget?</div>
+        <div class="config-sub">Drag to set your comfort zone — we will find the best fit.</div>
+        <div class="budget-display" id="budgetDisplay">$400/mo</div>
+        <input class="budget-slider" id="budgetSlider" type="range" min="200" max="1000" step="50" value="400" />
+        <div class="budget-labels"><span>$200/mo</span><span>$600/mo</span><span>$1,000/mo</span></div>
+        <div class="config-nav" style="margin-top:32px"><button class="config-back" onclick="goStep(2)">&#x2190; Back</button><button class="config-next" onclick="generateResult()">See My AI Plan &#x2192;</button></div>
+      </div>
+      <div class="config-panel" id="configStep4">
+        <div class="config-question">Your Custom AI Plan</div>
+        <div class="config-sub">Based on your answers — here is exactly what we would build for you.</div>
+        <div class="config-result" id="configResult"></div>
+        <div class="config-nav" style="margin-top:24px"><button class="config-back" onclick="goStep(3)">&#x2190; Adjust</button><a href="#contact" class="config-next" style="text-decoration:none;display:inline-block">Book Free Chat &#x2192;</a></div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="pricing" id="pricing">
   <div class="reveal" style="text-align:center">
     <div class="section-label">Pricing</div>
-    <h2 class="section-title">Simple. Fixed. No Surprises.</h2>
+    <h2 class="section-title word-reveal">Simple. Fixed. No Surprises.</h2>
     <p class="section-sub" style="margin:0 auto">One setup fee to build it. One monthly fee to keep it running.</p>
   </div>
   <div class="pricing-grid" style="margin:52px auto 0">
     <div class="price-card reveal">
       <h3>Starter</h3><div class="price-sub">Small businesses getting started</div>
-      <div class="price-amount">$1,500 <span>setup</span></div>
-      <div class="price-mo">+ $300/month</div>
-      <ul class="price-features">
-        <li>AI chatbot for your website</li><li>Answers customer questions</li>
-        <li>Up to 500 chats/month</li><li>Monthly report</li><li>Email support</li>
-      </ul>
+      <div class="price-amount">$1,500 <span>setup</span></div><div class="price-mo">+ $300/month</div>
+      <ul class="price-features"><li>AI chatbot for your website</li><li>Answers customer questions</li><li>Up to 500 chats/month</li><li>Monthly report</li><li>Email support</li></ul>
       <button class="price-btn ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
     </div>
     <div class="price-card featured reveal">
       <div class="featured-badge">Most Popular</div>
       <h3>Professional</h3><div class="price-sub">For businesses ready to automate</div>
-      <div class="price-amount">$3,000 <span>setup</span></div>
-      <div class="price-mo">+ $600/month</div>
-      <ul class="price-features">
-        <li>AI receptionist + chatbot</li><li>Booking & calendar integration</li>
-        <li>Unlimited conversations</li><li>Lead capture & follow-up</li>
-        <li>Monthly strategy call</li><li>Priority support</li>
-      </ul>
+      <div class="price-amount">$3,000 <span>setup</span></div><div class="price-mo">+ $600/month</div>
+      <ul class="price-features"><li>AI receptionist + chatbot</li><li>Booking and calendar integration</li><li>Unlimited conversations</li><li>Lead capture and follow-up</li><li>Monthly strategy call</li><li>Priority support</li></ul>
       <button class="price-btn solid" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
     </div>
     <div class="price-card reveal">
       <h3>Custom</h3><div class="price-sub">Complex or multi-location businesses</div>
-      <div class="price-amount" style="font-size:28px">Let's Talk</div>
-      <div class="price-mo">Scoped to your needs</div>
-      <ul class="price-features">
-        <li>Fully custom AI build</li><li>Multiple automations</li>
-        <li>CRM & system integrations</li><li>Dedicated support</li><li>Team training</li>
-      </ul>
+      <div class="price-amount" style="font-size:28px">Let's Talk</div><div class="price-mo">Scoped to your needs</div>
+      <ul class="price-features"><li>Fully custom AI build</li><li>Multiple automations</li><li>CRM and system integrations</li><li>Dedicated support</li><li>Team training</li></ul>
       <button class="price-btn ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Talk to Us</button>
     </div>
   </div>
 </section>
-
-<!-- ABOUT -->
 <section class="about" id="about">
   <div class="about-inner">
     <div class="reveal">
       <div class="section-label">About Kronos AI</div>
-      <h2 class="section-title">Built by Someone Who Gets It</h2>
+      <h2 class="section-title word-reveal">Built by Someone Who Gets It</h2>
       <p>Hey, I'm <strong>Kieron (Ron)</strong> — I started Kronos AI because I kept seeing great local businesses drowning in admin work that AI can handle automatically.</p>
       <p>We're lean, fast, and hands-on. No jargon, no overcomplicated setup. We build your AI system, get it live in 2 weeks, and stay in your corner every month after that.</p>
       <p>Based in <strong>Hamilton, Waikato</strong> — working with businesses across New Zealand.</p>
       <a href="#contact" class="btn-primary" style="display:inline-block;margin-top:16px">Let's Have a Chat</a>
     </div>
     <div class="highlight-list reveal">
-      <div class="hl"><span class="hl-icon">🇳🇿</span><div><div class="hl-text">New Zealand Based</div><div class="hl-sub">Local support, your timezone, real humans</div></div></div>
-      <div class="hl"><span class="hl-icon">⚡</span><div><div class="hl-text">Fast Delivery</div><div class="hl-sub">Most projects live within 2 weeks</div></div></div>
-      <div class="hl"><span class="hl-icon">🔧</span><div><div class="hl-text">Fully Custom Builds</div><div class="hl-sub">Built specifically for your business</div></div></div>
-      <div class="hl"><span class="hl-icon">📈</span><div><div class="hl-text">Ongoing Optimisation</div><div class="hl-sub">Monthly retainer keeps it improving</div></div></div>
-      <div class="hl"><span class="hl-icon">💬</span><div><div class="hl-text">Plain English Always</div><div class="hl-sub">No tech jargon, ever</div></div></div>
+      <div class="hl"><span class="hl-icon">&#x1F1F3;&#x1F1FF;</span><div><div class="hl-text">New Zealand Based</div><div class="hl-sub">Local support, your timezone, real humans</div></div></div>
+      <div class="hl"><span class="hl-icon">&#x26A1;</span><div><div class="hl-text">Fast Delivery</div><div class="hl-sub">Most projects live within 2 weeks</div></div></div>
+      <div class="hl"><span class="hl-icon">&#x1F527;</span><div><div class="hl-text">Fully Custom Builds</div><div class="hl-sub">Built specifically for your business</div></div></div>
+      <div class="hl"><span class="hl-icon">&#x1F4C8;</span><div><div class="hl-text">Ongoing Optimisation</div><div class="hl-sub">Monthly retainer keeps it improving</div></div></div>
+      <div class="hl"><span class="hl-icon">&#x1F4AC;</span><div><div class="hl-text">Plain English Always</div><div class="hl-sub">No tech jargon, ever</div></div></div>
     </div>
   </div>
 </section>
-
-<!-- CONTACT -->
 <section class="contact" id="contact">
   <div class="contact-inner">
     <div class="reveal">
       <div class="section-label">Get In Touch</div>
-      <h2 class="section-title">Book a Free Chat</h2>
+      <h2 class="section-title word-reveal">Book a Free Chat</h2>
       <p style="font-size:15px;color:var(--muted);line-height:1.7;font-weight:300">30 minutes. No pressure. We'll show you exactly what AI can do for your business.</p>
     </div>
     <form class="contact-card reveal" action="https://formspree.io/f/mykvbvqn" method="POST" onsubmit="handleSubmit(event)">
@@ -558,314 +561,201 @@ footer { border-top:1px solid var(--border); padding:32px 6%; display:flex; alig
       <div class="form-field"><label>Email</label><input type="email" name="email" placeholder="you@yourbusiness.co.nz" required /></div>
       <div class="form-field">
         <label>Industry</label>
-        <select name="industry"><option value="">Select industry...</option><option>Trades & Construction</option><option>Healthcare / Dental</option><option>Real Estate</option><option>Hospitality</option><option>Legal</option><option>Education</option><option>Retail</option><option>Other</option></select>
+        <select name="industry"><option value="">Select industry...</option><option>Trades and Construction</option><option>Healthcare / Dental</option><option>Real Estate</option><option>Hospitality</option><option>Legal</option><option>Education</option><option>Retail</option><option>Other</option></select>
       </div>
       <div class="form-field"><label>Biggest time waster?</label><textarea name="message" placeholder="e.g. Answering the same questions, chasing invoices, manual bookings..."></textarea></div>
-      <button type="submit" class="submit-btn" id="submitBtn">Book My Free Chat →</button>
-      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">🔒 No spam. Just an honest chat about what AI can do for you.</p>
+      <button type="submit" class="submit-btn" id="submitBtn">Book My Free Chat &#x2192;</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">&#x1F512; No spam. Just an honest chat about what AI can do for you.</p>
     </form>
   </div>
 </section>
-
 <footer>
   <div class="footer-logo">Kronos<span>AI</span></div>
-  <div class="footer-copy">© 2026 Kronos AI · Hamilton, New Zealand</div>
-  <div class="footer-links"><a href="#services">Services</a><a href="#demos">Demos</a><a href="#contact">Contact</a></div>
+  <div class="footer-copy">&#x00A9; 2026 Kronos AI · Hamilton, New Zealand</div>
+  <div class="footer-links"><a href="#services">Services</a><a href="#demos">Demos</a><a href="#roi">Calculator</a><a href="#configurator">Build AI</a><a href="#contact">Contact</a></div>
 </footer>
-
-</div><!-- end mainSite -->
-
+</div>
 <script>
-// ═══════════════════════════════════════
-// LOADER — WORMHOLE / SPACE ANIMATION
-// ═══════════════════════════════════════
-const loaderCanvas = document.getElementById('loaderCanvas');
-const lctx = loaderCanvas.getContext('2d');
-let loaderW, loaderH, loaderFrame = 0;
-let loaderRunning = true;
-
-function resizeLoader() {
-  loaderW = loaderCanvas.width = window.innerWidth;
-  loaderH = loaderCanvas.height = window.innerHeight;
-}
+const loaderCanvas=document.getElementById('loaderCanvas');
+const lctx=loaderCanvas.getContext('2d');
+let loaderW,loaderH,loaderFrame=0,loaderRunning=true;
+function resizeLoader(){loaderW=loaderCanvas.width=window.innerWidth;loaderH=loaderCanvas.height=window.innerHeight;}
 resizeLoader();
-
-// Stars
-const stars = Array.from({length:400}, () => ({
-  x: Math.random() * 2 - 1,
-  y: Math.random() * 2 - 1,
-  z: Math.random(),
-  size: Math.random() * 2 + 0.5,
-  speed: Math.random() * 0.008 + 0.002,
-  hue: Math.random() * 60 + 180,
-}));
-
-// Wormhole rings
-const rings = Array.from({length:20}, (_, i) => ({
-  radius: (i / 20) * 0.8 + 0.05,
-  rotation: Math.random() * Math.PI * 2,
-  rotSpeed: (Math.random() - .5) * 0.01,
-  tilt: (Math.random() - .5) * .4,
-  color: i % 3 === 0 ? '#00D4FF' : i % 3 === 1 ? '#7B2FFF' : '#FFB800',
-  alpha: 0.1 + (i/20) * 0.3,
-}));
-
-function drawLoader() {
-  if (!loaderRunning) return;
-  loaderFrame++;
-
-  lctx.fillStyle = `rgba(0,0,0,${loaderFrame < 30 ? 1 : 0.15})`;
-  lctx.fillRect(0, 0, loaderW, loaderH);
-
-  const cx = loaderW / 2, cy = loaderH / 2;
-  const maxR = Math.min(loaderW, loaderH) * 0.45;
-
-  // Deep space glow
-  const deepGlow = lctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 1.2);
-  deepGlow.addColorStop(0, 'rgba(123,47,255,0.15)');
-  deepGlow.addColorStop(0.4, 'rgba(0,212,255,0.06)');
-  deepGlow.addColorStop(1, 'transparent');
-  lctx.fillStyle = deepGlow;
-  lctx.fillRect(0, 0, loaderW, loaderH);
-
-  // Wormhole tunnel
-  for (let i = rings.length - 1; i >= 0; i--) {
-    const ring = rings[i];
-    ring.rotation += ring.rotSpeed;
-    const t = (loaderFrame * 0.008 + i * 0.15) % 1;
-    const r = maxR * ring.radius * (0.3 + t * 0.7);
-    const perspective = 1 - ring.radius * 0.5;
-
-    lctx.save();
-    lctx.translate(cx, cy);
-    lctx.scale(1, perspective * 0.4 + 0.2);
-    lctx.rotate(ring.rotation + loaderFrame * 0.003);
-
-    // Ring glow
-    lctx.shadowBlur = 20;
-    lctx.shadowColor = ring.color;
-    lctx.strokeStyle = ring.color;
-    lctx.globalAlpha = ring.alpha * (0.5 + 0.5 * Math.sin(loaderFrame * 0.05 + i));
-    lctx.lineWidth = 1.5;
-    lctx.beginPath();
-    lctx.ellipse(0, 0, r, r * 0.3, ring.tilt, 0, Math.PI * 2);
-    lctx.stroke();
-
-    // Ring segments
-    for (let j = 0; j < 8; j++) {
-      const a = (j / 8) * Math.PI * 2 + ring.rotation;
-      const sx = Math.cos(a) * r;
-      const sy = Math.sin(a) * r * 0.3;
-      lctx.fillStyle = ring.color;
-      lctx.globalAlpha = ring.alpha * 0.8;
-      lctx.beginPath();
-      lctx.arc(sx, sy, 2, 0, Math.PI * 2);
-      lctx.fill();
-    }
-
+const loaderStars=Array.from({length:400},()=>({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random(),size:Math.random()*2+0.5,speed:Math.random()*0.008+0.002,hue:Math.random()*60+180}));
+const rings=Array.from({length:20},(_,i)=>({radius:(i/20)*0.8+0.05,rotation:Math.random()*Math.PI*2,rotSpeed:(Math.random()-.5)*0.01,tilt:(Math.random()-.5)*.4,color:i%3===0?'#00D4FF':i%3===1?'#7B2FFF':'#FFB800',alpha:0.1+(i/20)*0.3}));
+function drawLoader(){
+  if(!loaderRunning)return;loaderFrame++;
+  lctx.fillStyle='rgba(0,0,0,'+(loaderFrame<30?1:0.15)+')';lctx.fillRect(0,0,loaderW,loaderH);
+  const cx=loaderW/2,cy=loaderH/2,maxR=Math.min(loaderW,loaderH)*0.45;
+  const dg=lctx.createRadialGradient(cx,cy,0,cx,cy,maxR*1.2);
+  dg.addColorStop(0,'rgba(123,47,255,0.15)');dg.addColorStop(0.4,'rgba(0,212,255,0.06)');dg.addColorStop(1,'transparent');
+  lctx.fillStyle=dg;lctx.fillRect(0,0,loaderW,loaderH);
+  for(let i=rings.length-1;i>=0;i--){
+    const r2=rings[i];r2.rotation+=r2.rotSpeed;
+    const t=(loaderFrame*0.008+i*0.15)%1,r=maxR*r2.radius*(0.3+t*0.7),p=1-r2.radius*0.5;
+    lctx.save();lctx.translate(cx,cy);lctx.scale(1,p*0.4+0.2);lctx.rotate(r2.rotation+loaderFrame*0.003);
+    lctx.shadowBlur=20;lctx.shadowColor=r2.color;lctx.strokeStyle=r2.color;
+    lctx.globalAlpha=r2.alpha*(0.5+0.5*Math.sin(loaderFrame*0.05+i));
+    lctx.lineWidth=1.5;lctx.beginPath();lctx.ellipse(0,0,r,r*0.3,r2.tilt,0,Math.PI*2);lctx.stroke();
+    for(let j=0;j<8;j++){const a=(j/8)*Math.PI*2+r2.rotation;lctx.fillStyle=r2.color;lctx.globalAlpha=r2.alpha*0.8;lctx.beginPath();lctx.arc(Math.cos(a)*r,Math.sin(a)*r*0.3,2,0,Math.PI*2);lctx.fill();}
     lctx.restore();
   }
-
-  // Flying stars toward viewer
-  lctx.shadowBlur = 0;
-  stars.forEach(star => {
-    star.z -= star.speed * (1 + loaderFrame * 0.001);
-    if (star.z <= 0) {
-      star.z = 1;
-      star.x = Math.random() * 2 - 1;
-      star.y = Math.random() * 2 - 1;
-    }
-
-    const px = (star.x / star.z) * maxR + cx;
-    const py = (star.y / star.z) * maxR * 0.6 + cy;
-    const size = star.size * (1 - star.z) * 3;
-    const alpha = (1 - star.z) * 0.9;
-
-    if (px < 0 || px > loaderW || py < 0 || py > loaderH) return;
-
-    // Star trail
-    const trailLen = size * 8;
-    const trailX = (star.x / (star.z + star.speed * 3)) * maxR + cx;
-    const trailY = (star.y / (star.z + star.speed * 3)) * maxR * 0.6 + cy;
-    const grad = lctx.createLinearGradient(trailX, trailY, px, py);
-    grad.addColorStop(0, 'transparent');
-    grad.addColorStop(1, `hsla(${star.hue},100%,80%,${alpha})`);
-    lctx.strokeStyle = grad;
-    lctx.lineWidth = size * 0.5;
-    lctx.globalAlpha = 1;
-    lctx.beginPath();
-    lctx.moveTo(trailX, trailY);
-    lctx.lineTo(px, py);
-    lctx.stroke();
-
-    // Star dot
-    lctx.fillStyle = `hsla(${star.hue},100%,90%,${alpha})`;
-    lctx.shadowBlur = size * 4;
-    lctx.shadowColor = `hsla(${star.hue},100%,80%,0.8)`;
-    lctx.beginPath();
-    lctx.arc(px, py, size * 0.6, 0, Math.PI * 2);
-    lctx.fill();
-    lctx.shadowBlur = 0;
+  lctx.shadowBlur=0;
+  loaderStars.forEach(s=>{
+    s.z-=s.speed*(1+loaderFrame*0.001);if(s.z<=0){s.z=1;s.x=Math.random()*2-1;s.y=Math.random()*2-1;}
+    const px=(s.x/s.z)*maxR+cx,py=(s.y/s.z)*maxR*0.6+cy,sz=s.size*(1-s.z)*3,al=(1-s.z)*0.9;
+    if(px<0||px>loaderW||py<0||py>loaderH)return;
+    const tx=(s.x/(s.z+s.speed*3))*maxR+cx,ty=(s.y/(s.z+s.speed*3))*maxR*0.6+cy;
+    const gr=lctx.createLinearGradient(tx,ty,px,py);gr.addColorStop(0,'transparent');gr.addColorStop(1,'hsla('+s.hue+',100%,80%,'+al+')');
+    lctx.strokeStyle=gr;lctx.lineWidth=sz*0.5;lctx.globalAlpha=1;lctx.beginPath();lctx.moveTo(tx,ty);lctx.lineTo(px,py);lctx.stroke();
+    lctx.fillStyle='hsla('+s.hue+',100%,90%,'+al+')';lctx.shadowBlur=sz*4;lctx.shadowColor='hsla('+s.hue+',100%,80%,0.8)';
+    lctx.beginPath();lctx.arc(px,py,sz*0.6,0,Math.PI*2);lctx.fill();lctx.shadowBlur=0;
   });
-
-  // Central void
-  const voidGrad = lctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.12);
-  voidGrad.addColorStop(0, 'rgba(0,0,0,0.95)');
-  voidGrad.addColorStop(0.6, 'rgba(0,0,0,0.6)');
-  voidGrad.addColorStop(1, 'transparent');
-  lctx.globalAlpha = 1;
-  lctx.fillStyle = voidGrad;
-  lctx.beginPath();
-  lctx.arc(cx, cy, maxR * 0.15, 0, Math.PI * 2);
-  lctx.fill();
-
+  const vg=lctx.createRadialGradient(cx,cy,0,cx,cy,maxR*0.12);
+  vg.addColorStop(0,'rgba(0,0,0,0.95)');vg.addColorStop(0.6,'rgba(0,0,0,0.6)');vg.addColorStop(1,'transparent');
+  lctx.globalAlpha=1;lctx.fillStyle=vg;lctx.beginPath();lctx.arc(cx,cy,maxR*0.15,0,Math.PI*2);lctx.fill();
   requestAnimationFrame(drawLoader);
 }
-
 drawLoader();
-
-// Progress bar & exit
-let progress = 0;
-const progressInterval = setInterval(() => {
-  progress += Math.random() * 4 + 1;
-  if (progress > 100) progress = 100;
-  document.getElementById('progressFill').style.width = progress + '%';
-  if (progress >= 100) {
-    clearInterval(progressInterval);
-    setTimeout(exitLoader, 400);
-  }
-}, 60);
-
-function exitLoader() {
-  loaderRunning = false;
+let progress=0;
+const progressInterval=setInterval(()=>{
+  progress+=Math.random()*4+1;if(progress>100)progress=100;
+  document.getElementById('progressFill').style.width=progress+'%';
+  if(progress>=100){clearInterval(progressInterval);setTimeout(exitLoader,400);}
+},60);
+function exitLoader(){
+  loaderRunning=false;
   document.getElementById('loader').classList.add('exit');
   document.getElementById('mainSite').classList.add('visible');
-  setTimeout(() => {
-    document.getElementById('loader').style.display = 'none';
-    initHero();
-  }, 1200);
+  setTimeout(()=>{document.getElementById('loader').style.display='none';initHero();},1200);
 }
-
-// ═══════════════════════════════════════
-// HERO — SPACE / STAR FIELD ANIMATION
-// ═══════════════════════════════════════
-function initHero() {
-  const heroCanvas = document.getElementById('heroCanvas');
-  const hctx = heroCanvas.getContext('2d');
-  let heroW, heroH, heroFrame = 0;
-
-  function resizeHero() {
-    heroW = heroCanvas.width = heroCanvas.offsetWidth;
-    heroH = heroCanvas.height = heroCanvas.offsetHeight;
-  }
-  resizeHero();
-  window.addEventListener('resize', resizeHero);
-
-  // Hero star field
-  const heroStars = Array.from({length:200}, () => ({
-    x: Math.random() * heroW,
-    y: Math.random() * heroH,
-    size: Math.random() * 1.5 + 0.3,
-    speed: Math.random() * 0.3 + 0.05,
-    hue: Math.random() * 60 + 180,
-    alpha: Math.random() * 0.6 + 0.2,
-    twinkle: Math.random() * Math.PI * 2,
-  }));
-
-  // Shooting stars
-  const shootingStars = [];
-  function spawnShootingStar() {
-    shootingStars.push({
-      x: Math.random() * heroW,
-      y: Math.random() * heroH * 0.5,
-      len: Math.random() * 120 + 60,
-      speed: Math.random() * 6 + 4,
-      angle: Math.PI / 4 + (Math.random() - .5) * 0.3,
-      alpha: 1,
-      hue: Math.random() > .5 ? 200 : 270,
+function initHero(){
+  const hc=document.getElementById('heroCanvas'),hctx=hc.getContext('2d');
+  let hW,hH,hF=0;
+  function rsz(){hW=hc.width=hc.offsetWidth;hH=hc.height=hc.offsetHeight;}rsz();window.addEventListener('resize',rsz);
+  const hs=Array.from({length:200},()=>({x:Math.random()*hW,y:Math.random()*hH,size:Math.random()*1.5+0.3,speed:Math.random()*0.3+0.05,hue:Math.random()*60+180,alpha:Math.random()*0.6+0.2,twinkle:Math.random()*Math.PI*2}));
+  const ss=[];
+  function spawnSS(){ss.push({x:Math.random()*hW,y:Math.random()*hH*0.5,len:Math.random()*120+60,speed:Math.random()*6+4,angle:Math.PI/4+(Math.random()-.5)*0.3,alpha:1,hue:Math.random()>.5?200:270});}
+  hctx.fillStyle='#020408';hctx.fillRect(0,0,hW,hH);
+  function anim(){
+    hF++;hctx.fillStyle='rgba(2,4,8,0.25)';hctx.fillRect(0,0,hW,hH);
+    hs.forEach(s=>{
+      s.y-=s.speed*0.1;if(s.y<0){s.y=hH;s.x=Math.random()*hW;}
+      s.twinkle+=0.03;const a=s.alpha*(0.6+0.4*Math.sin(s.twinkle));
+      hctx.globalAlpha=a;hctx.shadowBlur=s.size*3;hctx.shadowColor='hsla('+s.hue+',80%,90%,0.6)';
+      hctx.fillStyle='hsla('+s.hue+',60%,95%,1)';hctx.beginPath();hctx.arc(s.x,s.y,s.size,0,Math.PI*2);hctx.fill();
     });
-  }
-
-  // Clear canvas once with pure black
-  hctx.fillStyle = '#020408';
-  hctx.fillRect(0, 0, heroW, heroH);
-
-  function animHero() {
-    heroFrame++;
-    // Very subtle trail fade — keeps stars crisp
-    hctx.fillStyle = 'rgba(2,4,8,0.25)';
-    hctx.fillRect(0, 0, heroW, heroH);
-
-    // Stars
-    heroStars.forEach(s => {
-      s.y -= s.speed * 0.1;
-      if (s.y < 0) { s.y = heroH; s.x = Math.random() * heroW; }
-      s.twinkle += 0.03;
-      const a = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
-      hctx.globalAlpha = a;
-      hctx.shadowBlur = s.size * 3;
-      hctx.shadowColor = `hsla(${s.hue},80%,90%,0.6)`;
-      hctx.fillStyle = `hsla(${s.hue},60%,95%,1)`;
-      hctx.beginPath();
-      hctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-      hctx.fill();
-    });
-    hctx.shadowBlur = 0;
-
-    // Shooting stars
-    if (heroFrame % 90 === 0 && Math.random() > 0.3) spawnShootingStar();
-    for (let i = shootingStars.length - 1; i >= 0; i--) {
-      const ss = shootingStars[i];
-      ss.x += Math.cos(ss.angle) * ss.speed;
-      ss.y += Math.sin(ss.angle) * ss.speed;
-      ss.alpha -= 0.015;
-      if (ss.alpha <= 0 || ss.x > heroW || ss.y > heroH) { shootingStars.splice(i, 1); continue; }
-      const tx = ss.x - Math.cos(ss.angle) * ss.len;
-      const ty = ss.y - Math.sin(ss.angle) * ss.len;
-      const sg = hctx.createLinearGradient(tx, ty, ss.x, ss.y);
-      sg.addColorStop(0, 'transparent');
-      sg.addColorStop(1, `hsla(${ss.hue},100%,90%,${ss.alpha})`);
-      hctx.globalAlpha = 1;
-      hctx.strokeStyle = sg;
-      hctx.lineWidth = 1.5;
-      hctx.shadowBlur = 6;
-      hctx.shadowColor = `hsla(${ss.hue},100%,80%,0.6)`;
-      hctx.beginPath();
-      hctx.moveTo(tx, ty);
-      hctx.lineTo(ss.x, ss.y);
-      hctx.stroke();
-      hctx.shadowBlur = 0;
+    hctx.shadowBlur=0;
+    if(hF%90===0&&Math.random()>0.3)spawnSS();
+    for(let i=ss.length-1;i>=0;i--){
+      const s=ss[i];s.x+=Math.cos(s.angle)*s.speed;s.y+=Math.sin(s.angle)*s.speed;s.alpha-=0.015;
+      if(s.alpha<=0||s.x>hW||s.y>hH){ss.splice(i,1);continue;}
+      const tx=s.x-Math.cos(s.angle)*s.len,ty=s.y-Math.sin(s.angle)*s.len;
+      const sg=hctx.createLinearGradient(tx,ty,s.x,s.y);sg.addColorStop(0,'transparent');sg.addColorStop(1,'hsla('+s.hue+',100%,90%,'+s.alpha+')');
+      hctx.globalAlpha=1;hctx.strokeStyle=sg;hctx.lineWidth=1.5;hctx.shadowBlur=6;hctx.shadowColor='hsla('+s.hue+',100%,80%,0.6)';
+      hctx.beginPath();hctx.moveTo(tx,ty);hctx.lineTo(s.x,s.y);hctx.stroke();hctx.shadowBlur=0;
     }
-
-    hctx.globalAlpha = 1;
-    requestAnimationFrame(animHero);
+    hctx.globalAlpha=1;requestAnimationFrame(anim);
   }
-
-  animHero();
+  anim();
 }
-
-// ═══════════════════════════════════════
-// SCROLL REVEAL
-// ═══════════════════════════════════════
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
-}, { threshold:0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Form
-function handleSubmit(e) {
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Sending...';
-  btn.disabled = true;
-  setTimeout(() => {
-    btn.textContent = '✓ Sent! We\'ll be in touch within 24 hours.';
-    btn.style.background = '#00E096';
-  }, 1500);
+function initWordReveal(){
+  document.querySelectorAll('.word-reveal').forEach(el=>{
+    const words=el.textContent.trim().split(/\s+/);
+    el.innerHTML=words.map((w,i)=>'<span class="word" style="transition-delay:'+i*0.08+'s">'+w+'</span>').join(' ');
+  });
 }
-
-window.addEventListener('resize', () => {
-  resizeLoader();
+initWordReveal();
+const revObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revObs.unobserve(e.target);}});},{threshold:0.1});
+document.querySelectorAll('.reveal,.word-reveal').forEach(el=>revObs.observe(el));
+function animCounter(el,target,pre,suf){
+  const from=parseInt(el.dataset.prev||0)||0;el.dataset.prev=target;
+  const t0=performance.now();
+  (function step(now){const p=Math.min((now-t0)/800,1),ease=1-Math.pow(1-p,3),v=Math.round(from+(target-from)*ease);el.textContent=pre+v.toLocaleString()+suf;if(p<1)requestAnimationFrame(step);})(performance.now());
+}
+function updateROI(){
+  const rate=parseFloat(document.getElementById('roiRate').value)||75;
+  const hrs=parseFloat(document.getElementById('roiHours').value)||10;
+  const annLoss=Math.round(rate*hrs*52),kronosCost=10200,saved=Math.max(0,annLoss-kronosCost);
+  const payDays=annLoss>0?Math.round((kronosCost/annLoss)*365):999;
+  animCounter(document.getElementById('roiLoss'),annLoss,'$','');
+  animCounter(document.getElementById('roiCost'),kronosCost,'$','');
+  animCounter(document.getElementById('roiSave'),saved,'$','');
+  const pbEl=document.getElementById('roiPayback');
+  pbEl.textContent=payDays<30?payDays+' days':Math.round(payDays/30)+' months';
+  setTimeout(()=>{document.getElementById('roiBar').style.width=Math.min(100,Math.max(4,100-(payDays/365*100)))+'%';},200);
+}
+['roiRate','roiHours'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',function(){document.getElementById(id+'Slider').value=this.value;updateROI();});
+  document.getElementById(id+'Slider').addEventListener('input',function(){document.getElementById(id).value=this.value;updateROI();});
 });
+updateROI();
+document.getElementById('budgetSlider').addEventListener('input',function(){document.getElementById('budgetDisplay').textContent='$'+this.value+'/mo';});
+const configData={industry:null,problem:null,budget:400};
+function goStep(n){
+  document.querySelectorAll('.config-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('configStep'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const ind=document.getElementById('stepInd'+i);ind.classList.remove('active','done');
+    if(i<n)ind.classList.add('done');if(i===n)ind.classList.add('active');
+    const dv=document.getElementById('div'+i);if(dv)dv.classList.toggle('done',i<n);
+  }
+}
+document.getElementById('industryOpts').addEventListener('click',e=>{
+  const opt=e.target.closest('.config-opt');if(!opt)return;
+  document.querySelectorAll('#industryOpts .config-opt').forEach(o=>o.classList.remove('selected'));
+  opt.classList.add('selected');configData.industry=opt.dataset.val;document.getElementById('next1').disabled=false;
+});
+document.getElementById('problemOpts').addEventListener('click',e=>{
+  const opt=e.target.closest('.config-opt');if(!opt)return;
+  document.querySelectorAll('#problemOpts .config-opt').forEach(o=>o.classList.remove('selected'));
+  opt.classList.add('selected');configData.problem=opt.dataset.val;document.getElementById('next2').disabled=false;
+});
+document.getElementById('budgetSlider').addEventListener('input',function(){configData.budget=parseInt(this.value);document.getElementById('budgetDisplay').textContent='$'+this.value+'/mo';});
+const plans={dental:{enquiries:{name:'Dental AI Receptionist',features:['24/7 enquiry handling and triage','Appointment booking and reminders','FAQ auto-responses','New patient intake forms','Emergency query routing'],setup:2000,monthly:400},bookings:{name:'Smart Dental Booking System',features:['Online booking integration','Calendar sync and management','Automated patient reminders','Cancellation handling','Waitlist management'],setup:2000,monthly:400},followup:{name:'Patient Follow-Up Automation',features:['Post-appointment check-ins','Review request automation','Recall reminders','Treatment plan follow-up','Reactivation campaigns'],setup:1500,monthly:300},repetitive:{name:'Dental FAQ Chatbot',features:['Instant FAQ responses','Insurance query handling','Pricing information bot','Location and hours info','New patient guidance'],setup:1500,monthly:300},leads:{name:'New Patient Lead Generator',features:['Lead capture and qualification','Google Ads integration','Automated follow-up sequences','Referral tracking','Monthly performance reports'],setup:2500,monthly:500}},trades:{enquiries:{name:'Trades Enquiry Bot',features:['24/7 quote request handling','Job type qualification','Area coverage checker','Urgency triage','Lead capture and CRM sync'],setup:1500,monthly:300},bookings:{name:'Job Booking Automator',features:['Site visit scheduling','Crew allocation alerts','Job confirmation emails','Customer reminders','Calendar integration'],setup:2000,monthly:400},followup:{name:'Quote Follow-Up System',features:['Automated quote reminders','Win/loss tracking','Customer satisfaction surveys','Referral requests','Invoice reminders'],setup:1500,monthly:300},repetitive:{name:'Trades FAQ Bot',features:['Service area queries','Pricing guidance','Timeline estimates','Licensing and insurance info','Photo quote requests'],setup:1000,monthly:200},leads:{name:'Tradie Lead Machine',features:['Google and Facebook integration','Local area targeting','Automated outreach','Quote pipeline tracking','Monthly performance report'],setup:2500,monthly:500}},realestate:{enquiries:{name:'Property Enquiry AI',features:['24/7 listing enquiries','Buyer qualification','Viewing requests','Price guidance bot','Instant property info'],setup:2000,monthly:400},bookings:{name:'Viewing Scheduler',features:['Automated viewing bookings','Agent calendar sync','Buyer reminders','Open home management','Post-viewing follow-up'],setup:2000,monthly:400},followup:{name:'Lead Nurture System',features:['Long-term buyer nurturing','Market update emails','New listing alerts','Vendor communication','Appraisal follow-ups'],setup:1500,monthly:300},repetitive:{name:'Property FAQ Bot',features:['Instant listing info','Suburb data queries','Process explanations','Document checklists','Mortgage broker referrals'],setup:1500,monthly:300},leads:{name:'Real Estate Lead Gen',features:['Appraisal lead capture','Seller targeting campaigns','Buyer database building','Automated outreach','Pipeline dashboard'],setup:3000,monthly:500}},hospitality:{enquiries:{name:'Hospitality Concierge AI',features:['Reservation enquiries','Menu and dietary queries','Event bookings','Opening hours and location','Group booking handling'],setup:1500,monthly:300},bookings:{name:'Reservation Manager',features:['Online table bookings','Party size management','Special occasion notes','Confirmation and reminders','No-show reduction'],setup:2000,monthly:400},followup:{name:'Guest Follow-Up Bot',features:['Post-visit review requests','Loyalty programme nudges','Special offer campaigns','Birthday emails','Feedback collection'],setup:1500,monthly:300},repetitive:{name:'Hospitality FAQ Bot',features:['Menu queries answered','Allergen information','Parking and transport info','Event hire enquiries','Gift voucher queries'],setup:1000,monthly:200},leads:{name:'Events Lead Generator',features:['Function enquiry capture','Corporate client targeting','Automated proposals','Follow-up sequences','Booking conversion tracking'],setup:2500,monthly:500}},legal:{enquiries:{name:'Legal Intake Bot',features:['24/7 matter enquiries','Practice area routing','Conflict check initiation','Initial info collection','Consultation booking'],setup:2000,monthly:400},bookings:{name:'Consultation Scheduler',features:['Online booking system','Lawyer calendar sync','Matter type pre-screening','Document checklist emails','Reminder sequences'],setup:2000,monthly:400},followup:{name:'Client Follow-Up System',features:['Matter status updates','Document request reminders','Invoice follow-up','Satisfaction surveys','Referral requests'],setup:1500,monthly:300},repetitive:{name:'Legal FAQ Assistant',features:['Practice area explanations','Fee structure guidance','Process timelines','Document requirements','Legal aid eligibility'],setup:1500,monthly:300},leads:{name:'Legal Lead Generator',features:['Google Ads integration','Free consultation offers','Automated intake forms','Lead scoring and routing','Conversion tracking'],setup:3000,monthly:500}},education:{enquiries:{name:'Education Enquiry Bot',features:['Course information queries','Enrolment process guidance','Fee and funding info','Campus and schedule details','Application assistance'],setup:1500,monthly:300},bookings:{name:'Enrolment Scheduler',features:['Info session bookings','Advisor appointment system','Campus tour scheduling','Application reminders','Enrolment confirmations'],setup:2000,monthly:400},followup:{name:'Student Follow-Up System',features:['Application status updates','Enrolment reminders','Orientation information','Fee payment reminders','Ongoing engagement'],setup:1500,monthly:300},repetitive:{name:'Student FAQ Bot',features:['Course queries answered','Timetable information','Assessment deadlines','Support service info','Scholarship guidance'],setup:1000,monthly:200},leads:{name:'Student Recruitment AI',features:['Lead capture campaigns','School outreach automation','Open day promotion','Application nurture sequences','Enrolment conversion tracking'],setup:2500,monthly:500}}};
+function generateResult(){
+  configData.budget=parseInt(document.getElementById('budgetSlider').value);goStep(4);
+  const ind=configData.industry||'dental',prob=configData.problem||'enquiries';
+  const plan=(plans[ind]&&plans[ind][prob])||plans.dental.enquiries;
+  const b=configData.budget;
+  let tier,note;
+  if(b>=600){tier='Professional';note='Your budget fits our Professional package — AI receptionist, chatbot, and booking integration all included.';}
+  else if(b>=400){tier='Starter+';note='Great fit for our Starter plan with key add-ons. Most clients upgrade within 3 months.';}
+  else{tier='Starter';note='Our Starter plan fits your budget perfectly and delivers real results from day one.';}
+  document.getElementById('configResult').innerHTML='<div class="result-title">'+plan.name+'</div><div class="result-subtitle">'+note+'</div><div class="result-features">'+plan.features.map(f=>'<div class="result-feat">'+f+'</div>').join('')+'</div><div class="result-price-row"><div><div class="result-price">$'+plan.setup.toLocaleString()+' setup + $'+plan.monthly+'/mo</div><div class="result-price-sub">Estimated - confirmed after free consultation</div></div><div style="font-size:12px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:6px 14px;border-radius:8px;color:var(--cyan);font-weight:700">'+tier+'</div></div>';
+}
+const chatMsgsEl=document.getElementById('chatMessages');
+const chatInputEl=document.getElementById('chatInput');
+const chatSendEl=document.getElementById('chatSend');
+let chatHistory=[];
+const SYS='You are the Kronos AI sales assistant on the Kronos AI website. Kronos AI is a NZ AI automation agency in Hamilton, Waikato, run by Kieron. We build AI chatbots, virtual receptionists, smart websites, and workflows for NZ businesses. Services from $1,000-$3,000 setup + $200-$600/month. When someone tells you their industry or problem, give a SHORT punchy reply (2-3 sentences max) about what AI could do for THEIR specific business. Be enthusiastic but real. End with one concrete benefit. Natural conversation, no bullet points.';
+async function sendChat(){
+  const msg=chatInputEl.value.trim();if(!msg)return;
+  chatInputEl.value='';chatSendEl.disabled=true;
+  addMsg(msg,'user');chatHistory.push({role:'user',content:msg});
+  const typing=document.createElement('div');typing.className='chat-msg typing';typing.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  chatMsgsEl.appendChild(typing);chatMsgsEl.scrollTop=chatMsgsEl.scrollHeight;
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYS,messages:chatHistory})});
+    const d=await res.json();typing.remove();
+    const reply=(d.content&&d.content[0]&&d.content[0].text)||'That sounds like a great fit for AI! Book a free chat and Kieron will show you exactly what we would build.';
+    chatHistory.push({role:'assistant',content:reply});addMsg(reply,'bot');
+  }catch(e){typing.remove();addMsg('Having a moment! Book a free chat and Kieron will personally walk you through what AI can do for your business.','bot');}
+  chatSendEl.disabled=false;chatInputEl.focus();
+}
+function addMsg(text,role){
+  const el=document.createElement('div');el.className='chat-msg '+role;el.textContent=text;
+  el.style.cssText='opacity:0;transform:translateY(8px)';
+  chatMsgsEl.appendChild(el);chatMsgsEl.scrollTop=chatMsgsEl.scrollHeight;
+  requestAnimationFrame(()=>{el.style.transition='opacity .3s,transform .3s';el.style.opacity='1';el.style.transform='translateY(0)';});
+}
+chatSendEl.addEventListener('click',sendChat);
+chatInputEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+function handleSubmit(e){
+  const btn=document.getElementById('submitBtn');btn.textContent='Sending...';btn.disabled=true;
+  setTimeout(()=>{btn.textContent='Sent! We will be in touch within 24 hours.';btn.style.background='#00E096';},1500);
+}
+window.addEventListener('resize',resizeLoader);
 </script>
 </body>
 </html>
