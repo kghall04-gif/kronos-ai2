@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kronos AI — Lead Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020408;
+  --surface: #080D14;
+  --surface2: #0D1520;
+  --border: rgba(255,255,255,0.06);
+  --text: #E8EDF8;
+  --muted: #5A6480;
+  --cyan: #00D4FF;
+  --purple: #7B2FFF;
+  --red: #FF3B5C;
+  --green: #00E096;
+  --gold: #FFB800;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+/* HEADER */
+header {
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:16px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:blur(20px);
+}
+.logo { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:#fff; }
+.logo span { color:var(--cyan); }
+.header-stats { display:flex; gap:24px; }
+.hstat { text-align:center; }
+.hstat-num { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--cyan); }
+.hstat-num.red { color:var(--red); }
+.hstat-num.green { color:var(--green); }
+.hstat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+
+/* SEARCH AREA */
+.search-area {
+  padding:28px 32px 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.search-row { display:flex; gap:12px; margin-bottom:16px; }
+.search-input {
+  flex:1; background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; padding:13px 16px;
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px;
+  outline:none; transition:border-color .2s;
+}
+.search-input:focus { border-color:rgba(0,212,255,0.4); }
+.search-input::placeholder { color:var(--muted); }
+.search-btn {
+  background:linear-gradient(135deg,var(--cyan),#0099CC);
+  color:#020408; border:none; border-radius:10px;
+  padding:13px 28px; font-family:'DM Sans',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer; transition:all .2s;
+  white-space:nowrap;
+}
+.search-btn:hover { box-shadow:0 0 30px rgba(0,212,255,0.4); transform:translateY(-1px); }
+.search-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+/* QUICK SEARCH */
+.quick-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; }
+.quick-btns { display:flex; flex-wrap:wrap; gap:8px; }
+.quick-btn {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; padding:7px 14px;
+  font-size:13px; color:var(--muted); cursor:pointer;
+  transition:all .2s; font-family:'DM Sans',sans-serif;
+}
+.quick-btn:hover { border-color:rgba(0,212,255,0.3); color:var(--cyan); background:rgba(0,212,255,0.05); }
+
+/* FILTERS */
+.filter-bar {
+  padding:14px 32px;
+  display:flex; align-items:center; gap:10px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.filter-btn {
+  background:transparent; border:1px solid var(--border);
+  border-radius:8px; padding:7px 16px;
+  font-size:13px; color:var(--muted); cursor:pointer;
+  transition:all .2s; font-family:'DM Sans',sans-serif;
+}
+.filter-btn:hover { border-color:rgba(255,255,255,0.15); color:var(--text); }
+.filter-btn.active { border-color:var(--cyan); color:var(--cyan); background:rgba(0,212,255,0.08); }
+.filter-btn.red-filter.active { border-color:var(--red); color:var(--red); background:rgba(255,59,92,0.08); }
+.result-count { margin-left:auto; font-size:13px; color:var(--muted); }
+
+/* RESULTS GRID */
+.results-area { padding:24px 32px; }
+.results-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+
+/* EMPTY / LOADING STATES */
+.state-box {
+  grid-column:1/-1; text-align:center;
+  padding:80px 20px;
+}
+.state-icon { font-size:48px; margin-bottom:16px; }
+.state-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
+.state-sub { font-size:14px; color:var(--muted); }
+.spinner {
+  width:40px; height:40px; border:3px solid var(--border);
+  border-top-color:var(--cyan); border-radius:50%;
+  animation:spin .8s linear infinite; margin:0 auto 20px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* CARDS */
+.lead-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:20px; transition:all .25s;
+  display:flex; flex-direction:column; gap:12px;
+  position:relative; overflow:hidden;
+}
+.lead-card:hover { transform:translateY(-2px); box-shadow:0 8px 40px rgba(0,0,0,.4); }
+.lead-card.hot {
+  border-color:rgba(255,59,92,0.35);
+  box-shadow:0 0 20px rgba(255,59,92,0.08);
+}
+.lead-card.hot::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+}
+
+.hot-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(255,59,92,0.12); border:1px solid rgba(255,59,92,0.3);
+  color:var(--red); font-size:10px; font-weight:700;
+  padding:3px 10px; border-radius:100px; text-transform:uppercase; letter-spacing:.08em;
+  margin-bottom:4px; width:fit-content;
+}
+.hot-dot { width:6px; height:6px; background:var(--red); border-radius:50%; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+.card-name { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:#fff; line-height:1.3; }
+.card-address { font-size:13px; color:var(--muted); line-height:1.5; }
+
+.card-meta { display:flex; flex-wrap:wrap; gap:8px; }
+.meta-chip {
+  display:flex; align-items:center; gap:5px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; padding:4px 10px; font-size:12px; color:var(--muted);
+}
+.meta-chip.rating { color:var(--gold); border-color:rgba(255,184,0,0.2); background:rgba(255,184,0,0.06); }
+.meta-chip.has-web { color:var(--muted); }
+.meta-chip.no-web { color:var(--red); border-color:rgba(255,59,92,0.2); background:rgba(255,59,92,0.06); }
+.meta-chip.phone-chip { color:var(--cyan); border-color:rgba(0,212,255,0.2); background:rgba(0,212,255,0.06); }
+.meta-chip.open { color:var(--green); border-color:rgba(0,224,150,0.2); background:rgba(0,224,150,0.06); }
+
+/* CARD ACTIONS */
+.card-actions { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
+.card-btn {
+  flex:1; min-width:80px; padding:9px 10px; border-radius:8px;
+  font-size:12px; font-weight:600; cursor:pointer;
+  transition:all .2s; text-align:center; text-decoration:none;
+  font-family:'DM Sans',sans-serif; border:none; display:inline-block;
+}
+.card-btn.call {
+  background:rgba(0,224,150,0.1); border:1px solid rgba(0,224,150,0.25);
+  color:var(--green);
+}
+.card-btn.call:hover { background:rgba(0,224,150,0.18); }
+.card-btn.demo {
+  background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.25);
+  color:var(--cyan);
+}
+.card-btn.demo:hover { background:rgba(0,212,255,0.18); }
+.card-btn.sheet {
+  background:rgba(123,47,255,0.1); border:1px solid rgba(123,47,255,0.25);
+  color:#a78bfa;
+}
+.card-btn.sheet:hover { background:rgba(123,47,255,0.18); }
+.card-btn.sheet.copied { background:rgba(0,224,150,0.1); border-color:rgba(0,224,150,0.25); color:var(--green); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:999;
+  background:var(--surface); border:1px solid rgba(0,212,255,0.3);
+  border-radius:10px; padding:12px 20px;
+  font-size:14px; color:var(--text);
+  box-shadow:0 4px 30px rgba(0,0,0,.5);
+  animation:toastIn .3s ease;
+  pointer-events:none;
+}
+@keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+@media(max-width:600px) {
+  .search-row { flex-direction:column; }
+  .header-stats { gap:16px; }
+  .results-area { padding:16px; }
+  .search-area { padding:20px 16px 16px; }
+  .filter-bar { padding:12px 16px; overflow-x:auto; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Kronos<span>AI</span> <span style="font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:8px">Lead Finder</span></div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-num" id="statTotal">0</div><div class="hstat-label">Found</div></div>
+    <div class="hstat"><div class="hstat-num red" id="statNoWeb">0</div><div class="hstat-label">No Website</div></div>
+    <div class="hstat"><div class="hstat-num green" id="statAdded">0</div><div class="hstat-label">Added</div></div>
+  </div>
+</header>
+
+<div class="search-area">
+  <div class="search-row">
+    <input class="search-input" id="queryInput" type="text" placeholder="Industry (e.g. Plumber, Electrician, Cafe...)" />
+    <input class="search-input" id="locationInput" type="text" placeholder="City" value="Hamilton NZ" style="max-width:220px" />
+    <button class="search-btn" id="searchBtn" onclick="runSearch()">Search</button>
+  </div>
+  <div class="quick-label">Quick Search</div>
+  <div class="quick-btns">
+    <button class="quick-btn" onclick="quickSearch('Plumber','Hamilton NZ')">Plumber Hamilton</button>
+    <button class="quick-btn" onclick="quickSearch('Electrician','Hamilton NZ')">Electrician Hamilton</button>
+    <button class="quick-btn" onclick="quickSearch('Painter','Hamilton NZ')">Painter Hamilton</button>
+    <button class="quick-btn" onclick="quickSearch('Plumber','Auckland NZ')">Plumber Auckland</button>
+    <button class="quick-btn" onclick="quickSearch('Electrician','Auckland NZ')">Electrician Auckland</button>
+    <button class="quick-btn" onclick="quickSearch('Cafe','Hamilton NZ')">Cafe Hamilton</button>
+    <button class="quick-btn" onclick="quickSearch('Barber','Hamilton NZ')">Barber Hamilton</button>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn red-filter" data-filter="noweb" onclick="setFilter('noweb',this)">No Website Only</button>
+  <button class="filter-btn" data-filter="stars" onclick="setFilter('stars',this)">4+ Stars</button>
+  <span class="result-count" id="resultCount"></span>
+</div>
+
+<div class="results-area">
+  <div class="results-grid" id="resultsGrid">
+    <div class="state-box">
+      <div class="state-icon">🔍</div>
+      <div class="state-title">Find Your Next Client</div>
+      <div class="state-sub">Search an industry and city above, or use a quick search button.<br>Businesses with no website are highlighted as hot leads.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1BYn0vVtnEjhyRwT8OOYi2FS-l1FkniA0LDwUGPaZJi8/edit';
+let allResults = [];
+let activeFilter = 'all';
+let addedCount = 0;
+
+async function runSearch() {
+  const query = document.getElementById('queryInput').value.trim();
+  const location = document.getElementById('locationInput').value.trim() || 'Hamilton NZ';
+  if (!query) { showToast('Enter an industry to search'); return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Searching...';
+
+  showLoading();
+
+  try {
+    const res = await fetch(`/api/places?query=${encodeURIComponent(query)}&location=${encodeURIComponent(location)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+    allResults = data;
+    updateStats();
+    renderResults();
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Search';
+  }
+}
+
+function quickSearch(industry, city) {
+  document.getElementById('queryInput').value = industry;
+  document.getElementById('locationInput').value = city;
+  runSearch();
+}
+
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderResults();
+}
+
+function getFiltered() {
+  if (activeFilter === 'noweb') return allResults.filter(r => !r.website);
+  if (activeFilter === 'stars') return allResults.filter(r => r.rating >= 4);
+  return allResults;
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = allResults.length;
+  document.getElementById('statNoWeb').textContent = allResults.filter(r => !r.website).length;
+  document.getElementById('statAdded').textContent = addedCount;
+}
+
+function renderResults() {
+  const filtered = getFiltered();
+  const grid = document.getElementById('resultsGrid');
+  document.getElementById('resultCount').textContent = filtered.length + ' result' + (filtered.length !== 1 ? 's' : '');
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="state-box"><div class="state-icon">😶</div><div class="state-title">No results for this filter</div><div class="state-sub">Try a different filter or search.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((biz, i) => buildCard(biz, i)).join('');
+}
+
+function buildCard(biz, i) {
+  const hot = !biz.website;
+  const hotBadge = hot ? `<div class="hot-badge"><div class="hot-dot"></div>No Website — Hot Lead</div>` : '';
+  const rating = biz.rating ? `<div class="meta-chip rating">⭐ ${biz.rating} (${biz.reviewCount})</div>` : '';
+  const webChip = biz.website
+    ? `<div class="meta-chip has-web">🌐 Has website</div>`
+    : `<div class="meta-chip no-web">🚫 No website</div>`;
+  const phoneChip = biz.phone ? `<div class="meta-chip phone-chip">📞 ${biz.phone}</div>` : '';
+  const openChip = biz.openNow === true ? `<div class="meta-chip open">🟢 Open now</div>` : biz.openNow === false ? `<div class="meta-chip" style="color:#ff4466">🔴 Closed</div>` : '';
+
+  const callBtn = biz.phone
+    ? `<a class="card-btn call" href="tel:${biz.phone.replace(/\s/g,'')}">📞 Call</a>`
+    : `<button class="card-btn call" style="opacity:.35;cursor:not-allowed" disabled>📞 No Phone</button>`;
+
+  const demoUrl = `https://demo.kronosai.co.nz?biz=${encodeURIComponent(biz.name)}`;
+  const demoBtn = `<a class="card-btn demo" href="${demoUrl}" target="_blank">🤖 View Demo</a>`;
+
+  const idx = allResults.findIndex(r => r.name === biz.name);
+  const sheetBtn = `<button class="card-btn sheet" id="sheetBtn${idx}" onclick="addToSheet(${idx})">📋 Add to Sheet</button>`;
+
+  return `
+    <div class="lead-card${hot ? ' hot' : ''}">
+      ${hotBadge}
+      <div class="card-name">${escHtml(biz.name)}</div>
+      <div class="card-address">${escHtml(biz.address)}</div>
+      <div class="card-meta">
+        ${rating}${webChip}${phoneChip}${openChip}
+      </div>
+      <div class="card-actions">
+        ${callBtn}${demoBtn}${sheetBtn}
+      </div>
+    </div>`;
+}
+
+function addToSheet(idx) {
+  const biz = allResults[idx];
+  if (!biz) return;
+
+  const row = [
+    biz.name,
+    biz.address,
+    biz.phone || '',
+    biz.rating || '',
+    biz.website || 'NO WEBSITE',
+    new Date().toLocaleDateString('en-NZ'),
+  ].join('\t');
+
+  navigator.clipboard.writeText(row).then(() => {
+    const btn = document.getElementById('sheetBtn' + idx);
+    if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); }
+    addedCount++;
+    document.getElementById('statAdded').textContent = addedCount;
+    showToast('Row copied — opening sheet...');
+    setTimeout(() => window.open(SHEET_URL, '_blank'), 600);
+  }).catch(() => {
+    showToast('Could not copy — check clipboard permissions');
+  });
+}
+
+function showLoading() {
+  document.getElementById('resultsGrid').innerHTML = `
+    <div class="state-box">
+      <div class="spinner"></div>
+      <div class="state-title">Searching...</div>
+      <div class="state-sub">Fetching businesses and checking for websites</div>
+    </div>`;
+  document.getElementById('resultCount').textContent = '';
+}
+
+function showError(msg) {
+  document.getElementById('resultsGrid').innerHTML = `
+    <div class="state-box">
+      <div class="state-icon">⚠️</div>
+      <div class="state-title">Something went wrong</div>
+      <div class="state-sub">${escHtml(msg)}</div>
+    </div>`;
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('queryInput').addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+document.getElementById('locationInput').addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+</script>
+</body>
+</html>
