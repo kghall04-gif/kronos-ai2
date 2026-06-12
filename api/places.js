@@ -1,58 +1,75 @@
-export default async function handler(req, res) {
+const https = require('https');
+
+function fetchUrl(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch(e) { reject(e); }
+      });
+    }).on('error', reject);
+  });
+}
+
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { query, location = 'Hamilton, New Zealand' } = req.query;
-  if (!query) return res.status(400).json({ error: 'Missing query param' });
+  const { query, location } = req.query;
+  if (!query || !location) return res.status(400).json({ error: 'Missing query or location' });
 
   const key = process.env.GOOGLE_PLACES_KEY;
   if (!key) return res.status(500).json({ error: 'Missing API key' });
 
   try {
-    // Step 1: Geocode the location
-    const geoRes = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${key}`
-    );
-    const geoData = await geoRes.json();
-    if (!geoData.results?.length) return res.status(400).json({ error: 'Could not geocode location' });
+    // Step 1: Geocode
+    const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location + ' New Zealand')}&key=${key}`;
+    const geoData = await fetchUrl(geoUrl);
+
+    if (!geoData.results || geoData.results.length === 0) {
+      return res.status(404).json({ error: 'Location not found', status: geoData.status });
+    }
 
     const { lat, lng } = geoData.results[0].geometry.location;
 
-    // Step 2: Text Search
-    const searchRes = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${lat},${lng}&radius=20000&key=${key}`
-    );
-    const searchData = await searchRes.json();
-    if (!searchData.results?.length) return res.status(200).json([]);
+    // Step 2: Text search
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + ' ' + location + ' New Zealand')}&location=${lat},${lng}&radius=20000&key=${key}`;
+    const searchData = await fetchUrl(searchUrl);
 
-    // Step 3: Fetch details for each place (up to 20)
-    const places = searchData.results.slice(0, 20);
-    const details = await Promise.all(
-      places.map(async (place) => {
-        const detailRes = await fetch(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,website,rating,user_ratings_total,opening_hours,business_status&key=${key}`
-        );
-        const detailData = await detailRes.json();
-        const d = detailData.result || {};
-        return {
-          name: d.name || place.name,
-          address: d.formatted_address || place.formatted_address || '',
-          phone: d.formatted_phone_number || null,
-          website: d.website || null,
-          rating: d.rating || place.rating || null,
-          reviewCount: d.user_ratings_total || place.user_ratings_total || 0,
-          openNow: d.opening_hours?.open_now ?? null,
-          status: d.business_status || 'OPERATIONAL',
-        };
-      })
-    );
+    if (!searchData.results || searchData.results.length === 0) {
+      return res.status(200).json({ results: [], message: 'No results found' });
+    }
 
-    return res.status(200).json(details);
-  } catch (err) {
-    return res.status(500).json({ error: 'Something went wrong', detail: err.message });
+    // Step 3: Get details for top 15
+    const places = searchData.results.slice(0, 15);
+    const detailed = [];
+
+    for (const place of places) {
+      try {
+        const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number,website,rating,opening_hours,formatted_address&key=${key}`;
+        const detailData = await fetchUrl(detailUrl);
+        if (detailData.result) {
+          detailed.push({
+            place_id: place.place_id,
+            name: detailData.result.name,
+            phone: detailData.result.formatted_phone_number || '',
+            website: detailData.result.website || '',
+            hasWebsite: !!detailData.result.website,
+            rating: detailData.result.rating || 0,
+            address: detailData.result.formatted_address || '',
+            isOpen: detailData.result.opening_hours?.open_now
+          });
+        }
+      } catch(e) {}
+    }
+
+    return res.status(200).json({ results: detailed, location: { lat, lng } });
+
+  } catch(e) {
+    return res.status(500).json({ error: e.message });
   }
-}
+};
